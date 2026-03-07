@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "npm --prefix frontend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npx vercel dev --local --yes --local-config vercel.backend.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
@@ -16,6 +18,7 @@
     "@types/node": "^22.13.10",
     "@vercel/node": "^5.1.12",
     "typescript": "^5.8.2",
+    "vercel": "^50.28.0",
     "vitest": "^3.0.8"
   }
 }

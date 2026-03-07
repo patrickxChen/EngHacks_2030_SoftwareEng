@@ -11,6 +11,7 @@ interface AppLayoutProps {
 
 const navItems = [
   { label: "Daily Digest", href: "/home" },
+  { label: "Feed", href: "/feed" },
   { label: "Submit", href: "/submit" },
   { label: "Search", href: "/search" }
 ];

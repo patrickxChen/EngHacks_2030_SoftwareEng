@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from "react-router-
 import { AppLayout } from "./components/AppLayout";
 import { EngBustersSplash } from "./components/EngBustersSplash";
 import { AdminPage } from "./pages/AdminPage";
+import { FeedPage } from "./pages/FeedPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
 import { MythDiscussionPage } from "./pages/MythDiscussionPage";
@@ -61,6 +62,14 @@ function App(): JSX.Element {
         element={
           <ProtectedRoute isLoggedIn={isLoggedIn}>
             <HomePage loggedInEmail={loggedInEmail} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/feed"
+        element={
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
+            <FeedPage />
           </ProtectedRoute>
         }
       />

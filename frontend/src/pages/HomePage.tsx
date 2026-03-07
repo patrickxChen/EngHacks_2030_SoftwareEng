@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { notificationItems, templateMyths } from "../data/mockData";
 import { PostCard } from "../components/PostCard";
+import { notificationItems, templateMyths } from "../data/mockData";
 import { fetchMyths } from "../lib/api";
 import type { Myth } from "../types";
 
@@ -12,7 +12,6 @@ interface HomePageProps {
 
 export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [digestView, setDigestView] = useState<"debunked" | "hot" | "true">("debunked");
   const [myths, setMyths] = useState<Myth[]>(templateMyths);
 
   useEffect(() => {
@@ -37,40 +36,8 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
     };
   }, []);
 
-  const mostDebunked = useMemo(() => {
-    return [...myths]
-      .sort((a, b) => {
-        const rateA = a.votesUp + a.votesDown ? a.votesDown / (a.votesUp + a.votesDown) : 0.5;
-        const rateB = b.votesUp + b.votesDown ? b.votesDown / (b.votesUp + b.votesDown) : 0.5;
-        return rateB - rateA;
-      })
-      .slice(0, 3);
-  }, [myths]);
-
-  const mostHot = useMemo(() => {
-    return [...myths]
-      .sort((a, b) => b.votesUp + b.votesDown - (a.votesUp + a.votesDown))
-      .slice(0, 3);
-  }, [myths]);
-
-  const mostTrue = useMemo(() => {
-    return [...myths]
-      .sort((a, b) => {
-        const trueA = a.votesUp + a.votesDown ? a.votesUp / (a.votesUp + a.votesDown) : 0.5;
-        const trueB = b.votesUp + b.votesDown ? b.votesUp / (b.votesUp + b.votesDown) : 0.5;
-        return trueB - trueA;
-      })
-      .slice(0, 3);
-  }, [myths]);
-
-  const digestViewMeta =
-    digestView === "debunked"
-      ? { title: "Most debunked right now", rows: mostDebunked }
-      : digestView === "hot"
-        ? { title: "Most hot", rows: mostHot }
-        : { title: "Most true", rows: mostTrue };
-
   const myPosts = useMemo(() => myths.slice(0, 5), [myths]);
+  const latestPost = myPosts[0] ?? null;
   const replyNotifications = useMemo(
     () => notificationItems.filter((note) => note.message.toLowerCase().includes("replied")),
     []
@@ -181,33 +148,16 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
       </section>
 
       <div className="concept-board">
-        <section className="digest-feed">
-          <header className="dashboard-panel-head digest-feed-head">
-            <div>
-              <p className="brand-kicker">EngBusters</p>
-              <h3>{digestViewMeta.title}</h3>
+        <section className="digest-feed digest-summary">
+          <p className="brand-kicker">Latest Post</p>
+          {latestPost ? (
+            <PostCard myth={latestPost} />
+          ) : (
+            <div className="empty-state">
+              <h3>No posts yet</h3>
+              <p className="muted-text">You have not posted any myths yet. Create one from Submit.</p>
             </div>
-            <label className="digest-picker-label">
-              View
-              <select
-                value={digestView}
-                onChange={(event) =>
-                  setDigestView(event.target.value as "debunked" | "hot" | "true")
-                }
-                aria-label="Choose Daily Digest ranking view"
-              >
-                <option value="debunked">Most debunked right now</option>
-                <option value="hot">Most hot</option>
-                <option value="true">Most true</option>
-              </select>
-            </label>
-          </header>
-
-          <div className="dashboard-grid digest-feed-grid">
-            {digestViewMeta.rows.map((myth) => (
-              <PostCard key={`${digestView}-${myth.id}`} myth={myth} />
-            ))}
-          </div>
+          )}
         </section>
 
         <aside className="digest-side">

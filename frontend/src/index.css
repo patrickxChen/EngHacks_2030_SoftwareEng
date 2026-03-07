@@ -1017,6 +1017,133 @@ fieldset {
   gap: 1.15rem;
 }
 
+.digest-summary {
+  border: 1px solid #2f3b5d;
+  border-radius: 14px;
+  padding: 1rem;
+  background: #0f172b;
+}
+
+.digest-summary .post-card {
+  margin-top: 0.35rem;
+}
+
+.feed-page {
+  display: grid;
+  gap: 1rem;
+  --feed-card-size: min(64vh, 560px);
+}
+
+.feed-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.feed-head {
+  border: 1px solid #2f3b5d;
+  border-radius: 14px;
+  padding: 0.95rem;
+  background: #0f172b;
+}
+
+.feed-head h2 {
+  margin: 0.18rem 0 0.22rem;
+}
+
+.feed-scroll {
+  min-height: calc(var(--feed-card-size) + 1.5rem);
+  overflow: hidden;
+  display: grid;
+  place-items: start center;
+  gap: 0;
+  padding-right: 0;
+  scroll-snap-type: none;
+  overscroll-behavior-y: contain;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.feed-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.feed-item {
+  min-height: calc(var(--feed-card-size) + 1rem);
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  animation: card-in 220ms ease-out both;
+}
+
+.feed-item-single {
+  width: var(--feed-card-size);
+  max-width: 100%;
+}
+
+.feed-item .post-card {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: var(--feed-card-size);
+  max-height: var(--feed-card-size);
+  overflow: auto;
+  border-radius: 18px;
+  border-color: #3a3a3a;
+  background: #0d1528;
+  padding: 1rem;
+}
+
+.feed-controls {
+  display: grid;
+  gap: 0.7rem;
+  align-content: center;
+}
+
+.feed-nav-btn {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--ring);
+  border-radius: 999px;
+  background: #101b31;
+  color: #d8e6ff;
+  cursor: pointer;
+  font-size: 1.1rem;
+}
+
+.feed-nav-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.feed-end-indicator {
+  margin: 0;
+  border: 1px dashed #3c4e73;
+  border-radius: 12px;
+  background: rgba(15, 23, 43, 0.65);
+  padding: 0.65rem 0.8rem;
+  color: #c8d7ff;
+}
+
+@media (max-width: 920px) {
+  .feed-page {
+    --feed-card-size: min(82vw, 520px);
+  }
+
+  .feed-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .feed-controls {
+    grid-auto-flow: column;
+    justify-content: center;
+  }
+
+  .feed-scroll {
+    min-height: calc(var(--feed-card-size) + 1rem);
+  }
+}
+
 .digest-feed-head h3 {
   margin: 0.16rem 0 0;
 }
