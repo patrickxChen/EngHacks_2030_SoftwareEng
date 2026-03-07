@@ -4,6 +4,8 @@ import { PostCard } from "../components/PostCard";
 import { fetchMyths } from "../lib/api";
 import type { Myth } from "../types";
 
+const radarColors = ["#90f2e6", "#8fb7ff", "#7f88ff", "#9adf9f", "#ffb3d0"];
+
 interface HomePageProps {
   loggedInEmail: string;
 }
@@ -98,6 +100,51 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
     };
   }, [myths]);
 
+  const ghostRadar = useMemo(() => {
+    const bucket = new Map<string, number>();
+    for (const myth of myths) {
+      const zone = (myth.buildingCode || myth.scopeKey || "Unknown").toUpperCase().trim() || "Unknown";
+      bucket.set(zone, (bucket.get(zone) ?? 0) + 1);
+    }
+
+    const ranked = Array.from(bucket.entries())
+      .map(([zone, count]) => ({ zone, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    const total = ranked.reduce((sum, row) => sum + row.count, 0);
+    if (!total) {
+      return {
+        total: 0,
+        hotspot: "No myth data yet",
+        gradient: "conic-gradient(#2f3f65 0deg 360deg)",
+        rows: [] as Array<{ zone: string; count: number; percent: number; color: string }>
+      };
+    }
+
+    const rows = ranked.map((row, index) => ({
+      ...row,
+      percent: Math.round((row.count / total) * 100),
+      color: radarColors[index % radarColors.length]
+    }));
+
+    let cursor = 0;
+    const parts = rows.map((row) => {
+      const sweep = (row.count / total) * 360;
+      const start = cursor;
+      const end = cursor + sweep;
+      cursor = end;
+      return `${row.color} ${start}deg ${end}deg`;
+    });
+
+    return {
+      total,
+      hotspot: rows[0] ? `${rows[0].zone} (${rows[0].percent}%)` : "No myth data yet",
+      gradient: `conic-gradient(${parts.join(", ")})`,
+      rows
+    };
+  }, [myths]);
+
   return (
     <section className="page-enter concept-home">
       <span className="digest-ghost" aria-hidden="true" />
@@ -163,25 +210,56 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
           </div>
         </section>
 
-        <aside className={drawerOpen ? "open-panel" : "open-panel open-panel-hidden"}>
-          <h3>Activity</h3>
-          <p className="muted-text">Replies and your latest myth posts.</p>
+        <aside className="digest-side">
+          <section className="ghost-radar-card" aria-label="Ghost Radar concentration">
+            <p className="brand-kicker">Ghost Radar</p>
+            <h4>Spectral concentration map</h4>
+            <p className="muted-text">Hottest zone: {ghostRadar.hotspot}</p>
 
-          <h4>Replies</h4>
-          <ul className="drawer-list">
-            {replyNotifications.map((note) => (
-              <li key={note.id}>
-                <b>{note.fromUser}</b> {note.message}
-              </li>
-            ))}
-          </ul>
+            <div className="ghost-radar-wrap">
+              <div className="ghost-radar-ring" style={{ backgroundImage: ghostRadar.gradient }}>
+                <span className="ghost-radar-sweep" aria-hidden="true" />
+                <span className="ghost-radar-sigil" aria-hidden="true" />
+                <div className="ghost-radar-core">
+                  <b>{ghostRadar.total}</b>
+                  <span>myths</span>
+                </div>
+              </div>
+            </div>
 
-          <h4>Your Posts</h4>
-          <ul className="drawer-list">
-            {myPosts.map((myth) => (
-              <li key={`mypost-${myth.id}`}>{myth.text}</li>
-            ))}
-          </ul>
+            {ghostRadar.rows.length ? (
+              <ul className="ghost-radar-list">
+                {ghostRadar.rows.map((row) => (
+                  <li key={row.zone}>
+                    <span className="ghost-radar-dot" style={{ backgroundColor: row.color }} aria-hidden="true" />
+                    <span>{row.zone}</span>
+                    <b>{row.percent}%</b>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+
+          <section className={drawerOpen ? "open-panel" : "open-panel open-panel-hidden"}>
+            <h3>Activity</h3>
+            <p className="muted-text">Replies and your latest myth posts.</p>
+
+            <h4>Replies</h4>
+            <ul className="drawer-list">
+              {replyNotifications.map((note) => (
+                <li key={note.id}>
+                  <b>{note.fromUser}</b> {note.message}
+                </li>
+              ))}
+            </ul>
+
+            <h4>Your Posts</h4>
+            <ul className="drawer-list">
+              {myPosts.map((myth) => (
+                <li key={`mypost-${myth.id}`}>{myth.text}</li>
+              ))}
+            </ul>
+          </section>
         </aside>
       </div>
 
