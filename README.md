@@ -116,28 +116,6 @@ npm run typecheck
 npm test
 ```
 
-## Hackathon Demo Script (2-3 min)
-
-1. Open splash page and enter app.
-2. Show Daily Digest and highlight a trending myth.
-3. Navigate to Search and filter by category/tag.
-4. Open a myth discussion page, cast a vote, and add a comment.
-5. Submit a new myth and explain the verdict pipeline.
-6. Close with impact: faster, crowd-driven rumor verification for students.
-
-## Deployment
-
-- Backend is configured for Vercel Functions (`vercel.json`).
-- Frontend can be hosted on Vercel (or any static hosting) and pointed to API base URL.
-
-## Team Notes
-
-Prepared for EngHacks Software Engineering division judging with emphasis on:
-
-- product usefulness
-- technical depth
-- clarity of user experience
-- practical extensibility after hackathon
 
 
 
