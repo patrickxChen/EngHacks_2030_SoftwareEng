@@ -11,6 +11,7 @@ import { ResultsPage } from "./pages/ResultsPage";
 import { SubmitPage } from "./pages/SubmitPage";
 
 const LOGIN_KEY = "uw.loggedInEmail";
+
 function ProtectedRoute({
   isLoggedIn,
   children
@@ -60,7 +61,7 @@ function App(): JSX.Element {
         path="/home"
         element={
           <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <HomePage loggedInEmail={loggedInEmail} />
+            <HomePage loggedInEmail={loggedInEmail ?? ""} />
           </ProtectedRoute>
         }
       />
