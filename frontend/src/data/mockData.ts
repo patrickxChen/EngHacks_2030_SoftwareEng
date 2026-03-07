@@ -4,6 +4,33 @@ export const buildings = ["E7", "E2", "DC", "RCH", "CPH", "DWE"];
 
 export const templateMyths: Myth[] = [
   {
+    id: "tmpl-math135-goat",
+    scopeType: "course",
+    scopeKey: "MATH 135",
+    text: "Stephen Obinna is the goat",
+    buildingCode: "RCH",
+    programTag: "Math",
+    courseTag: "MATH 135",
+    tone: "funny",
+    verdictLabel: "LIKELY_TRUE",
+    verdictReason: "Class chat consensus says this one is almost undisputed.",
+    confidenceScore: 0.96,
+    votesUp: 96,
+    votesDown: 4,
+    testimonialCount: 1,
+    createdAt: "2026-03-07T14:40:00Z",
+    testimonials: [
+      {
+        id: "t-math135-goat-1",
+        userName: "CalcCrew",
+        buildingCode: "RCH",
+        text: "Legend status confirmed by every tutorial section.",
+        voteValue: 1,
+        createdAt: "2026-03-07T14:42:00Z"
+      }
+    ]
+  },
+  {
     id: "tmpl-course-1",
     scopeType: "course",
     scopeKey: "ECE 198",
