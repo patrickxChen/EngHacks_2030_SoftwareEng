@@ -1,12 +1,12 @@
 # Waterloo Engineering Myth Buster - Progress Tracker
 
 ## Current Status
-- Phase: Planning
-- Overall completion: 15%
+- Phase: Backend Scaffolded
+- Overall completion: 35%
 - Last updated: 2026-03-07
 
 ## Milestone Status
-1. Foundation and setup - In Progress
+1. Foundation and setup - Completed
 2. Auth and submission flow - Not Started
 3. Verdict engine and myth feed - Not Started
 4. Votes and testimonials - Not Started
@@ -20,13 +20,12 @@
 - Defined UI/UX design system and page-level behavior.
 
 ## In Progress
-- Finalizing stack and delivery rules.
-- Preparing project scaffold tasks.
+- Implementing backend endpoint logic on top of scaffolded routes.
 
 ## Next Up
-- Create actual app scaffold (frontend + firebase functions).
 - Implement auth and myth submission flow first.
 - Set up Firestore collections and indexes.
+- Add `POST /api/myths` creation endpoint with verdict persistence.
 
 ## Risks Log
 - AI output quality may vary by prompt quality.
@@ -34,7 +33,7 @@
 - Building map data source might require manual coordinates.
 
 ## Decision Log
-- Chosen architecture: React + Firebase + OpenAI in Functions.
+- Chosen architecture: React + Firestore/Auth + OpenAI in Vercel API routes.
 - Chosen data model: myths-centered schema with building aggregates.
 - Chosen UX focus: building-first navigation and comparatives.
 
@@ -43,7 +42,7 @@
 - [x] Feature scope definition
 - [x] Architecture draft
 - [x] Implementation plan draft
-- [ ] Project scaffold
+- [x] Project scaffold
 - [ ] Auth implementation
 - [ ] Myth submit + verdict integration
 - [ ] Voting + testimonials
