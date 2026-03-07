@@ -1,0 +1,55 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "myths",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "buildingCode",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "myths",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "programTag",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "buildingCode",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "myths",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "verdictLabel",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "buildingCode",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

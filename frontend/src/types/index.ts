@@ -11,10 +11,15 @@ export interface Testimonial {
 
 export interface Myth {
   id: string;
+  authorId?: string;
+  scopeType?: "course" | "prof" | "building";
+  scopeKey?: string;
+  status?: string;
   text: string;
   buildingCode: string;
   programTag?: string;
   courseTag?: string;
+  profTag?: string;
   tone: Tone;
   verdictLabel: VerdictLabel;
   verdictReason: string;

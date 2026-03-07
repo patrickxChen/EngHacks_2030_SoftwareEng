@@ -1,25 +1,33 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { buildings } from "../data/mockData";
+import { buildings } from "../data/buildings";
+import { createMyth } from "../lib/api";
 
 interface FormState {
   text: string;
+  scopeType: "building" | "course" | "prof";
   buildingCode: string;
   programTag: string;
   courseTag: string;
+  profTag: string;
   tone: "funny" | "serious";
 }
 
 const initialState: FormState = {
   text: "",
+  scopeType: "building",
   buildingCode: "",
   programTag: "",
   courseTag: "",
+  profTag: "",
   tone: "funny"
 };
 
 export function SubmitPage(): JSX.Element {
   const [form, setForm] = useState<FormState>(initialState);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [resultMessage, setResultMessage] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   const textError = useMemo(() => {
     if (!form.text.trim()) {
@@ -32,16 +40,54 @@ export function SubmitPage(): JSX.Element {
   }, [form.text]);
 
   const buildingError = form.buildingCode ? "" : "Building is required.";
+  const scopeError =
+    form.scopeType === "course"
+      ? form.courseTag.trim()
+        ? ""
+        : "Course code is required for course myths."
+      : form.scopeType === "prof"
+        ? form.profTag.trim()
+          ? ""
+          : "Professor name is required for professor myths."
+        : "";
 
-  const canSubmit = !textError && !buildingError;
+  const canSubmit = !textError && !buildingError && !scopeError;
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setSubmitted(true);
+    setResultMessage("");
+    setSubmitError("");
+
     if (!canSubmit) {
       return;
     }
-    setForm(initialState);
+
+    try {
+      setSubmitting(true);
+      await createMyth({
+        text: form.text.trim(),
+        scopeType: form.scopeType,
+        scopeKey:
+          form.scopeType === "course"
+            ? form.courseTag.trim()
+            : form.scopeType === "prof"
+              ? form.profTag.trim()
+              : form.buildingCode,
+        buildingCode: form.buildingCode,
+        programTag: form.programTag.trim(),
+        courseTag: form.courseTag.trim(),
+        profTag: form.profTag.trim(),
+        tone: form.tone
+      });
+      setForm(initialState);
+      setSubmitted(false);
+      setResultMessage("Myth submitted. Verdict generated and saved.");
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Failed to submit myth.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -59,6 +105,20 @@ export function SubmitPage(): JSX.Element {
             rows={4}
           />
           {submitted && textError ? <span className="form-error">{textError}</span> : null}
+        </label>
+
+        <label>
+          Myth category
+          <select
+            value={form.scopeType}
+            onChange={(event) =>
+              setForm({ ...form, scopeType: event.target.value as FormState["scopeType"] })
+            }
+          >
+            <option value="building">Building related</option>
+            <option value="course">Course related</option>
+            <option value="prof">Professor related</option>
+          </select>
         </label>
 
         <label>
@@ -95,7 +155,18 @@ export function SubmitPage(): JSX.Element {
               placeholder="ECE 198"
             />
           </label>
+
+          <label>
+            Professor
+            <input
+              value={form.profTag}
+              onChange={(event) => setForm({ ...form, profTag: event.target.value })}
+              placeholder="Prof. Name"
+            />
+          </label>
         </div>
+
+        {submitted && scopeError ? <p className="form-error">{scopeError}</p> : null}
 
         <fieldset>
           <legend>Tone preference</legend>
@@ -120,8 +191,11 @@ export function SubmitPage(): JSX.Element {
         </fieldset>
 
         <button className="btn btn-primary" type="submit">
-          Submit Myth
+          {submitting ? "Submitting..." : "Submit Myth"}
         </button>
+
+        {resultMessage ? <p className="muted-text">{resultMessage}</p> : null}
+        {submitError ? <p className="form-error">{submitError}</p> : null}
       </form>
     </section>
   );

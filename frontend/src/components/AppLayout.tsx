@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { NavLink } from "react-router-dom";
+import ghostImg from "../assets/ghost.png";
+import githubImg from "../assets/github.png";
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -8,9 +10,9 @@ interface AppLayoutProps {
 }
 
 const navItems = [
-  { label: "Home", href: "/" },
+  { label: "Daily Digest", href: "/home" },
   { label: "Submit", href: "/submit" },
-  { label: "Myths", href: "/myths" }
+  { label: "Search", href: "/search" }
 ];
 
 export function AppLayout({ children, loggedInEmail, onLogout }: AppLayoutProps): JSX.Element {
@@ -18,8 +20,13 @@ export function AppLayout({ children, loggedInEmail, onLogout }: AppLayoutProps)
     <div className="app-shell">
       <header className="top-nav page-enter">
         <div className="brand-block">
-          <p className="brand-kicker">Waterloo Engineering</p>
-          <h1>Myth Buster</h1>
+          <div className="brand-identity">
+            <img src={ghostImg} alt="Ghost mascot" className="brand-ghost" />
+            <div>
+              <p className="brand-kicker">Waterloo Engineering</p>
+              <h1>EngBusters</h1>
+            </div>
+          </div>
         </div>
 
         <nav aria-label="Main navigation" className="nav-links">
@@ -44,6 +51,18 @@ export function AppLayout({ children, loggedInEmail, onLogout }: AppLayoutProps)
         </div>
       </header>
       <main className="main-content">{children}</main>
+      <footer className="site-footer">
+        <a
+          href="https://github.com/patrickxChen/EngHacks_2030_SoftwareEng"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="github-link"
+          aria-label="View on GitHub"
+        >
+          <img src={githubImg} alt="GitHub" className="github-icon" />
+          <span>View on GitHub</span>
+        </a>
+      </footer>
     </div>
   );
 }

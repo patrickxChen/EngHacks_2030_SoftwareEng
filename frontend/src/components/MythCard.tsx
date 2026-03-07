@@ -1,7 +1,6 @@
+import { useNavigate } from "react-router-dom";
 import type { Myth } from "../types";
 import { BuildingBadge } from "./BuildingBadge";
-import { TestimonialList } from "./TestimonialList";
-import { VerdictBadge } from "./VerdictBadge";
 import { VoteWidget } from "./VoteWidget";
 
 interface MythCardProps {
@@ -10,28 +9,42 @@ interface MythCardProps {
 }
 
 export function MythCard({ myth, index = 0 }: MythCardProps): JSX.Element {
+  const navigate = useNavigate();
+  const totalVotes = myth.votesUp + myth.votesDown;
+  const mythRate = totalVotes ? Math.round((myth.votesDown / totalVotes) * 100) : 50;
+  const typeLabel =
+    myth.scopeType === "prof" ? "Professor" : myth.scopeType === "course" ? "Course" : "Building";
+  const typeValue = myth.profTag ?? myth.courseTag ?? myth.scopeKey ?? "General";
+
   return (
-    <article className="myth-card stagger-item" style={{ animationDelay: `${index * 70}ms` }}>
+    <article
+      className="myth-card myth-card-clickable stagger-item"
+      style={{ animationDelay: `${index * 70}ms` }}
+      onClick={() => navigate(`/myth/${myth.id}`)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          navigate(`/myth/${myth.id}`);
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label="Open myth discussion"
+    >
+      <div className="myth-rate-overlay" aria-label={`Myth rate ${mythRate}%`}>
+        <span className="myth-rate-label">Myth rate</span>
+        <strong className="myth-rate-value">{mythRate}%</strong>
+      </div>
+
       <header className="myth-header">
         <BuildingBadge buildingCode={myth.buildingCode} />
-        <VerdictBadge verdict={myth.verdictLabel} />
+        <span className="myth-scope-chip">{typeLabel}</span>
+        <code>{typeValue}</code>
       </header>
 
       <p className="myth-text">{myth.text}</p>
-      <p className="myth-reason">{myth.verdictReason}</p>
 
-      <div className="myth-meta">
-        {myth.programTag ? <span>{myth.programTag}</span> : <span>Any program</span>}
-        {myth.courseTag ? <code>{myth.courseTag}</code> : <span>No course tag</span>}
-        <span>Confidence {Math.round(myth.confidenceScore * 100)}%</span>
-      </div>
-
-      <VoteWidget initialUp={myth.votesUp} initialDown={myth.votesDown} />
-
-      <section className="myth-testimonials">
-        <h4>Testimonials</h4>
-        <TestimonialList testimonials={myth.testimonials} />
-      </section>
+      <VoteWidget mythId={myth.id} initialUp={myth.votesUp} initialDown={myth.votesDown} />
     </article>
   );
 }

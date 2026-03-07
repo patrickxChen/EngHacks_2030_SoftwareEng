@@ -19,16 +19,16 @@
 	- Email/password and Google sign-in.
 - Cloud Firestore
 	- Stores users, myths, votes, testimonials, reports, and building aggregates.
-- Firebase Cloud Functions (TypeScript)
+- Vercel Serverless Functions (TypeScript API routes)
 	- Generates AI verdicts.
 	- Enforces vote integrity.
 	- Maintains aggregate stats for charts/map.
 	- Handles moderation workflows.
-- Firebase Hosting
-	- Hosts SPA and rewrites API function routes.
+- Vercel
+	- Hosts API routes and can host frontend when ready.
 
 ## AI Layer
-- OpenAI API via Cloud Functions
+- OpenAI API via Vercel API routes
 	- Building-aware verdict generation with concise reasoning.
 	- Optional humor scoring for testimonials.
 
@@ -38,13 +38,15 @@
 - Vitest + React Testing Library
 	- Unit/component tests.
 - Firebase Emulator Suite
-	- Local auth/firestore/functions development and testing.
+	- Local auth/firestore development and testing.
+- Vercel CLI
+	- Local execution of API routes (`vercel dev`).
 - GitHub Actions
 	- CI: lint, test, build on pull request.
 
 ## Suggested Package Groups
 - Frontend: `react`, `react-dom`, `react-router-dom`, `recharts`, `framer-motion`, `zod`
-- Backend: `firebase-admin`, `firebase-functions`, `openai`
+- Backend: `firebase-admin`, `openai`, `zod`, `@vercel/node`
 - Tooling: `typescript`, `eslint`, `prettier`, `vitest`, `@testing-library/react`
 
 ## Why This Stack

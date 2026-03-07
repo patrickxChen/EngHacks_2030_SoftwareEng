@@ -1,9 +1,11 @@
-import { buildings } from "../data/mockData";
+import { buildings } from "../data/buildings";
 
 export interface MythFilters {
+  scopeType: "" | "course" | "prof" | "building";
   buildingCode: string;
   programTag: string;
   courseTag: string;
+  profTag: string;
   verdict: string;
 }
 
@@ -15,6 +17,21 @@ interface FilterBarProps {
 export function FilterBar({ filters, onChange }: FilterBarProps): JSX.Element {
   return (
     <section className="filter-bar" aria-label="Myth filters">
+      <label>
+        Type
+        <select
+          value={filters.scopeType}
+          onChange={(event) =>
+            onChange({ ...filters, scopeType: event.target.value as MythFilters["scopeType"] })
+          }
+        >
+          <option value="">All</option>
+          <option value="course">Course</option>
+          <option value="prof">Professor</option>
+          <option value="building">Building</option>
+        </select>
+      </label>
+
       <label>
         Building
         <select
@@ -45,6 +62,15 @@ export function FilterBar({ filters, onChange }: FilterBarProps): JSX.Element {
           placeholder="ECE 198"
           value={filters.courseTag}
           onChange={(event) => onChange({ ...filters, courseTag: event.target.value })}
+        />
+      </label>
+
+      <label>
+        Professor
+        <input
+          placeholder="Prof. Name"
+          value={filters.profTag}
+          onChange={(event) => onChange({ ...filters, profTag: event.target.value })}
         />
       </label>
 
