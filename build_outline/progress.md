@@ -2,14 +2,14 @@
 
 ## Current Status
 - Phase: Backend Scaffolded
-- Overall completion: 35%
+- Overall completion: 45%
 - Last updated: 2026-03-07
 
 ## Milestone Status
 1. Foundation and setup - Completed
-2. Auth and submission flow - Not Started
-3. Verdict engine and myth feed - Not Started
-4. Votes and testimonials - Not Started
+2. Auth and submission flow - In Progress
+3. Verdict engine and myth feed - In Progress
+4. Votes and testimonials - In Progress
 5. Analytics dashboard - Not Started
 6. Map and polish - Not Started
 
@@ -18,14 +18,17 @@
 - Wrote implementation plan.
 - Defined architecture, schema, and function responsibilities.
 - Defined UI/UX design system and page-level behavior.
+- Added Vercel backend scaffold with modular API routes.
+- Implemented `POST /api/myths` creation flow with verdict persistence.
+- Hardened Firestore rules for myth schema and immutable ownership fields.
 
 ## In Progress
-- Implementing backend endpoint logic on top of scaffolded routes.
+- Implementing remaining backend endpoint logic and role checks.
 
 ## Next Up
-- Implement auth and myth submission flow first.
-- Set up Firestore collections and indexes.
-- Add `POST /api/myths` creation endpoint with verdict persistence.
+- Add endpoint-level tests for `POST /api/myths` (auth + write + verdict path).
+- Finalize vote/testimonial integration checks with Firestore rules.
+- Implement building stats aggregation update logic.
 
 ## Risks Log
 - AI output quality may vary by prompt quality.
@@ -44,10 +47,10 @@
 - [x] Implementation plan draft
 - [x] Project scaffold
 - [ ] Auth implementation
-- [ ] Myth submit + verdict integration
+- [x] Myth submit + verdict integration
 - [ ] Voting + testimonials
 - [ ] Dashboard charts
 - [ ] Map view
-- [ ] Moderation and rules hardening
+- [x] Moderation and rules hardening
 - [ ] Deployment
 

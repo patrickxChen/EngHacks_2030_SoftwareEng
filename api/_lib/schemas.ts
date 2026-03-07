@@ -1,5 +1,27 @@
 import { z } from "zod";
 
+const scopeTypeSchema = z.enum(["course", "building"]);
+
+export const createMythRequestSchema = z
+  .object({
+    text: z.string().min(8).max(300),
+    scopeType: scopeTypeSchema,
+    scopeKey: z.string().min(2).max(20),
+    programTag: z.string().max(40).optional().default(""),
+    courseTag: z.string().max(20).optional().default(""),
+    buildingCode: z.string().min(2).max(10).optional(),
+    tone: z.enum(["funny", "serious"]).optional().default("funny")
+  })
+  .superRefine((value, ctx) => {
+    if (value.scopeType === "building" && !value.buildingCode) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["buildingCode"],
+        message: "buildingCode is required when scopeType is building."
+      });
+    }
+  });
+
 export const verdictRequestSchema = z.object({
   text: z.string().min(8).max(300),
   buildingCode: z.string().min(2).max(10),

@@ -8,6 +8,8 @@
 
 ## Implemented Route Stubs
 - `GET /api/health`
+- `GET /api/myths`
+- `POST /api/myths`
 - `POST /api/myths/generate-verdict`
 - `POST /api/myths/:mythId/vote`
 - `POST /api/myths/:mythId/testimonials`
