@@ -16,6 +16,14 @@ export function EngBustersSplash({ onEnter }: EngBustersSplashProps): JSX.Elemen
       <div className="engbusters-splash-content">
         <p className="splash-kicker">Waterloo Engineering</p>
         <h1>EngBusters</h1>
+        <p className="splash-description">
+          Crowd-verify engineering myths with votes, real student rationale, and fast discussion threads.
+        </p>
+        <div className="splash-highlights" aria-hidden="true">
+          <span>Vote True or False</span>
+          <span>Share Your Rationale</span>
+          <span>Spot Trending Myths</span>
+        </div>
         <p className="splash-cta">Click anywhere to enter</p>
       </div>
     </button>
