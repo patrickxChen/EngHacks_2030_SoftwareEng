@@ -10,7 +10,9 @@ interface AppLayoutProps {
 const navItems = [
   { label: "Home", href: "/" },
   { label: "Submit", href: "/submit" },
-  { label: "Myths", href: "/myths" }
+  { label: "Myths", href: "/myths" },
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Map", href: "/map" }
 ];
 
 export function AppLayout({ children, loggedInEmail, onLogout }: AppLayoutProps): JSX.Element {

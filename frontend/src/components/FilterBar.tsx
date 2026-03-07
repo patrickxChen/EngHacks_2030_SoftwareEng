@@ -1,4 +1,4 @@
-import { buildings } from "../data/mockData";
+import { buildings } from "../data/buildings";
 
 export interface MythFilters {
   buildingCode: string;

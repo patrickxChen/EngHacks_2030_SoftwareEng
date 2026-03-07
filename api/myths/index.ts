@@ -117,6 +117,10 @@ async function handleGetMyths(req: VercelRequest, res: VercelResponse): Promise<
         return {
           id: doc.id,
           text: String(data.text ?? ""),
+          authorId: String(data.authorId ?? ""),
+          scopeType: String(data.scopeType ?? "building"),
+          scopeKey: String(data.scopeKey ?? ""),
+          status: String(data.status ?? "active"),
           buildingCode: String(data.buildingCode ?? ""),
           programTag: String(data.programTag ?? ""),
           courseTag: String(data.courseTag ?? ""),

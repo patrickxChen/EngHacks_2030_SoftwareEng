@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AppLayout } from "./components/AppLayout";
+import { AdminPage } from "./pages/AdminPage";
+import { DashboardPage } from "./pages/DashboardPage";
 import { HomePage } from "./pages/HomePage";
 import { LoginPage } from "./pages/LoginPage";
+import { MapPage } from "./pages/MapPage";
 import { MythsPage } from "./pages/MythsPage";
 import { ResultsPage } from "./pages/ResultsPage";
 import { SubmitPage } from "./pages/SubmitPage";
@@ -78,6 +81,30 @@ function App(): JSX.Element {
         element={
           <ProtectedRoute isLoggedIn={isLoggedIn}>
             <MythsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/map"
+        element={
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
+            <MapPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute isLoggedIn={isLoggedIn}>
+            <AdminPage />
           </ProtectedRoute>
         }
       />

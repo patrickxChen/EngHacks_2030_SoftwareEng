@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { buildings } from "../data/mockData";
+import { buildings } from "../data/buildings";
+import { createMyth } from "../lib/api";
 
 interface FormState {
   text: string;
@@ -20,6 +21,9 @@ const initialState: FormState = {
 export function SubmitPage(): JSX.Element {
   const [form, setForm] = useState<FormState>(initialState);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [resultMessage, setResultMessage] = useState("");
+  const [submitError, setSubmitError] = useState("");
 
   const textError = useMemo(() => {
     if (!form.text.trim()) {
@@ -35,13 +39,35 @@ export function SubmitPage(): JSX.Element {
 
   const canSubmit = !textError && !buildingError;
 
-  const onSubmit = (event: FormEvent<HTMLFormElement>): void => {
+  const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setSubmitted(true);
+    setResultMessage("");
+    setSubmitError("");
+
     if (!canSubmit) {
       return;
     }
-    setForm(initialState);
+
+    try {
+      setSubmitting(true);
+      await createMyth({
+        text: form.text.trim(),
+        scopeType: "building",
+        scopeKey: form.buildingCode,
+        buildingCode: form.buildingCode,
+        programTag: form.programTag.trim(),
+        courseTag: form.courseTag.trim(),
+        tone: form.tone
+      });
+      setForm(initialState);
+      setSubmitted(false);
+      setResultMessage("Myth submitted. Verdict generated and saved.");
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : "Failed to submit myth.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -120,8 +146,11 @@ export function SubmitPage(): JSX.Element {
         </fieldset>
 
         <button className="btn btn-primary" type="submit">
-          Submit Myth
+          {submitting ? "Submitting..." : "Submit Myth"}
         </button>
+
+        {resultMessage ? <p className="muted-text">{resultMessage}</p> : null}
+        {submitError ? <p className="form-error">{submitError}</p> : null}
       </form>
     </section>
   );

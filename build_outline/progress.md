@@ -1,8 +1,8 @@
 # Waterloo Engineering Myth Buster - Progress Tracker
 
 ## Current Status
-- Phase: Backend Scaffolded
-- Overall completion: 45%
+- Phase: Frontend-Backend Integration
+- Overall completion: 60%
 - Last updated: 2026-03-07
 
 ## Milestone Status
@@ -10,8 +10,8 @@
 2. Auth and submission flow - In Progress
 3. Verdict engine and myth feed - In Progress
 4. Votes and testimonials - In Progress
-5. Analytics dashboard - Not Started
-6. Map and polish - Not Started
+5. Analytics dashboard - In Progress
+6. Map and polish - In Progress
 
 ## Completed
 - Established product concept and UW-engineering-specific direction.
@@ -21,14 +21,18 @@
 - Added Vercel backend scaffold with modular API routes.
 - Implemented `POST /api/myths` creation flow with verdict persistence.
 - Hardened Firestore rules for myth schema and immutable ownership fields.
+- Merged frontend branch into backend integration branch.
+- Wired frontend myths feed, submit flow, results search, dashboard, and map to backend API endpoints.
+- Added `GET /api/myths` feed endpoint to support frontend filtering/search.
 
 ## In Progress
-- Implementing remaining backend endpoint logic and role checks.
+- Stabilizing frontend auth-to-backend auth token flow.
+- Finalizing moderation and profile endpoints for non-mock admin/home drawer sections.
 
 ## Next Up
-- Add endpoint-level tests for `POST /api/myths` (auth + write + verdict path).
-- Finalize vote/testimonial integration checks with Firestore rules.
-- Implement building stats aggregation update logic.
+- Commit integration changes and push `backend` branch.
+- Replace localStorage-only login with Firebase Auth token wiring.
+- Implement moderation queue backend endpoints used by admin page.
 
 ## Risks Log
 - AI output quality may vary by prompt quality.

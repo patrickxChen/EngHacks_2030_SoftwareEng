@@ -1,7 +1,9 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { notificationItems, myths, userPostIds } from "../data/mockData";
+import { notificationItems } from "../data/mockData";
 import { PostCard } from "../components/PostCard";
+import { fetchMyths } from "../lib/api";
+import type { Myth } from "../types";
 
 interface HomePageProps {
   loggedInEmail: string;
@@ -11,9 +13,32 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [myths, setMyths] = useState<Myth[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    const run = async (): Promise<void> => {
+      try {
+        const rows = await fetchMyths({ limit: 12 });
+        if (active) {
+          setMyths(rows);
+        }
+      } catch {
+        if (active) {
+          setMyths([]);
+        }
+      }
+    };
+
+    void run();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const dashboardPosts = myths.slice(0, 4);
-  const myPosts = useMemo(() => myths.filter((myth) => userPostIds.includes(myth.id)), []);
+  const myPosts = useMemo(() => myths.slice(0, 5), [myths]);
   const replyNotifications = useMemo(
     () => notificationItems.filter((note) => note.message.toLowerCase().includes("replied")),
     []

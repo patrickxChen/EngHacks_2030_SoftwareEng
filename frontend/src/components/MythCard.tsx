@@ -26,7 +26,7 @@ export function MythCard({ myth, index = 0 }: MythCardProps): JSX.Element {
         <span>Confidence {Math.round(myth.confidenceScore * 100)}%</span>
       </div>
 
-      <VoteWidget initialUp={myth.votesUp} initialDown={myth.votesDown} />
+      <VoteWidget mythId={myth.id} initialUp={myth.votesUp} initialDown={myth.votesDown} />
 
       <section className="myth-testimonials">
         <h4>Testimonials</h4>
