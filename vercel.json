@@ -3,6 +3,7 @@
   "framework": "vite",
   "installCommand": "npm install && npm --prefix frontend install",
   "buildCommand": "npm --prefix frontend run build",
+  "devCommand": "npm --prefix frontend run dev",
   "outputDirectory": "frontend/dist",
   "rewrites": [
     {
@@ -14,5 +15,15 @@
     "api/**/*.ts": {
       "maxDuration": 15
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "http://localhost:5174" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ]
 }
