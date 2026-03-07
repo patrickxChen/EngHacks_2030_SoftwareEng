@@ -9,10 +9,36 @@ interface VoteWidgetProps {
 
 type VoteState = "up" | "down" | null;
 
+function loadVote(mythId: string): VoteState {
+  try {
+    return (localStorage.getItem(`vote:${mythId}`) as VoteState) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function loadCount(mythId: string, side: "up" | "down", fallback: number): number {
+  try {
+    const stored = localStorage.getItem(`vote-count:${mythId}:${side}`);
+    return stored !== null ? Number(stored) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveVoteState(mythId: string, vote: VoteState, up: number, down: number): void {
+  try {
+    if (vote) localStorage.setItem(`vote:${mythId}`, vote);
+    else localStorage.removeItem(`vote:${mythId}`);
+    localStorage.setItem(`vote-count:${mythId}:up`, String(up));
+    localStorage.setItem(`vote-count:${mythId}:down`, String(down));
+  } catch { /* ignore */ }
+}
+
 export function VoteWidget({ mythId, initialUp, initialDown }: VoteWidgetProps): JSX.Element {
-  const [vote, setVote] = useState<VoteState>(null);
-  const [upCount, setUpCount] = useState(initialUp);
-  const [downCount, setDownCount] = useState(initialDown);
+  const [vote, setVote] = useState<VoteState>(() => loadVote(mythId));
+  const [upCount, setUpCount] = useState(() => loadCount(mythId, "up", initialUp));
+  const [downCount, setDownCount] = useState(() => loadCount(mythId, "down", initialDown));
   const [pending, setPending] = useState(false);
 
   const handleVote = async (nextVote: VoteState): Promise<void> => {
@@ -37,6 +63,7 @@ export function VoteWidget({ mythId, initialUp, initialDown }: VoteWidgetProps):
     }
 
     setVote(nextVote);
+    saveVoteState(mythId, nextVote, nextVote === "up" ? upCount + 1 : upCount, nextVote === "down" ? downCount + 1 : downCount);
 
     try {
       setPending(true);
