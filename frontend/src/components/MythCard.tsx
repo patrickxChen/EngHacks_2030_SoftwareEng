@@ -12,6 +12,7 @@ export function MythCard({ myth, index = 0 }: MythCardProps): JSX.Element {
   const navigate = useNavigate();
   const totalVotes = myth.votesUp + myth.votesDown;
   const mythRate = totalVotes ? Math.round((myth.votesDown / totalVotes) * 100) : 50;
+  const isMythBusted = mythRate > 90;
   const typeLabel =
     myth.scopeType === "prof" ? "Professor" : myth.scopeType === "course" ? "Course" : "Building";
   const typeValue = myth.profTag ?? myth.courseTag ?? myth.scopeKey ?? "General";
@@ -31,9 +32,24 @@ export function MythCard({ myth, index = 0 }: MythCardProps): JSX.Element {
       role="button"
       aria-label="Open myth discussion"
     >
-      <div className="myth-rate-overlay" aria-label={`Myth rate ${mythRate}%`}>
-        <span className="myth-rate-label">Myth rate</span>
-        <strong className="myth-rate-value">{mythRate}%</strong>
+      <div
+        className={isMythBusted ? "myth-rate-overlay myth-rate-overlay-busted" : "myth-rate-overlay"}
+        aria-label={isMythBusted ? `Myth busted at ${mythRate}%` : `Myth rate ${mythRate}%`}
+      >
+        {isMythBusted ? (
+          <>
+            <span className="myth-busted-mark" aria-hidden="true">
+              X
+            </span>
+            <strong className="myth-busted-text">MYTH BUSTED</strong>
+            <span className="myth-rate-label">{mythRate}% myth rate</span>
+          </>
+        ) : (
+          <>
+            <span className="myth-rate-label">Myth rate</span>
+            <strong className="myth-rate-value">{mythRate}%</strong>
+          </>
+        )}
       </div>
 
       <header className="myth-header">

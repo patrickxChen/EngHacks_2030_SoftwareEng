@@ -80,8 +80,8 @@ export const templateMyths: Myth[] = [
     verdictReason:
       "DC silence is a scarce resource in October. Odds improve only before sunrise.",
     confidenceScore: 0.9,
-    votesUp: 18,
-    votesDown: 133,
+    votesUp: 9,
+    votesDown: 171,
     testimonialCount: 1,
     createdAt: "2026-03-03T09:00:00Z",
     testimonials: [
