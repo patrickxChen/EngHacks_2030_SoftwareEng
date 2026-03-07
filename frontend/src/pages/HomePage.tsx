@@ -19,12 +19,7 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
       try {
         const rows = await fetchMyths({ limit: 12 });
         if (active) {
-          const merged = [...templateMyths, ...rows];
-          const byId = new Map<string, Myth>();
-          for (const myth of merged) {
-            byId.set(myth.id, myth);
-          }
-          setMyths(Array.from(byId.values()));
+          setMyths(rows.length ? rows : templateMyths);
         }
       } catch {
         if (active) {

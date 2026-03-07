@@ -14,11 +14,14 @@ export function VoteWidget({ mythId, initialUp, initialDown }: VoteWidgetProps):
   const [upCount, setUpCount] = useState(initialUp);
   const [downCount, setDownCount] = useState(initialDown);
   const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
 
   const handleVote = async (nextVote: VoteState): Promise<void> => {
     if (!nextVote || nextVote === vote || pending) {
       return;
     }
+
+    setError("");
 
     const previousVote = vote;
     const previousUp = upCount;
@@ -43,11 +46,12 @@ export function VoteWidget({ mythId, initialUp, initialDown }: VoteWidgetProps):
     try {
       setPending(true);
       await castVote(mythId, nextVote === "up" ? 1 : -1);
-    } catch {
+    } catch (voteError) {
       // Revert optimistic state when request fails.
       setVote(previousVote);
       setUpCount(previousUp);
       setDownCount(previousDown);
+      setError(voteError instanceof Error ? voteError.message : "Vote failed.");
     } finally {
       setPending(false);
     }
@@ -94,6 +98,7 @@ export function VoteWidget({ mythId, initialUp, initialDown }: VoteWidgetProps):
           </span>
         </button>
       </div>
+      {error ? <p className="vote-error">{error}</p> : null}
     </div>
   );
 }

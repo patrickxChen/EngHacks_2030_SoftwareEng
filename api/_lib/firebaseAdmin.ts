@@ -2,6 +2,10 @@ import admin from "firebase-admin";
 
 let initialized = false;
 
+export function isFirebaseConfigured(): boolean {
+  return Boolean(process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+}
+
 function initializeAdmin(): void {
   if (initialized) {
     return;
@@ -70,8 +74,9 @@ export async function resolveUserId(input: {
     return uid;
   }
 
+  // Default demo auth to enabled for hackathon/demo flows unless explicitly disabled.
   const allowDemoAuth =
-    process.env.ALLOW_DEMO_AUTH === "true" ||
+    process.env.ALLOW_DEMO_AUTH !== "false" ||
     process.env.ALLOW_UNAUTHENTICATED_LOCAL === "true" ||
     process.env.VERCEL_ENV === "preview";
 

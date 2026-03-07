@@ -588,6 +588,13 @@ fieldset {
   font-size: 0.78rem;
 }
 
+.vote-error {
+  margin: 0.15rem 0 0;
+  width: 100%;
+  font-size: 0.76rem;
+  color: #ffcccc;
+}
+
 .post-reply-btn {
   min-width: 5.2rem;
   justify-content: center;
@@ -602,14 +609,102 @@ fieldset {
 
 .testimonial-list {
   display: grid;
-  gap: 0.5rem;
+  gap: 0.7rem;
 }
 
 .testimonial-card {
   border: 1px solid var(--ring);
   border-radius: 12px;
-  padding: 0.6rem;
+  padding: 0.72rem 0.78rem;
   background: #0f172b;
+}
+
+.testimonial-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin-bottom: 0.42rem;
+}
+
+.testimonial-user {
+  margin: 0;
+  font-weight: 700;
+}
+
+.testimonial-date {
+  color: #b8c1d9;
+}
+
+.testimonial-vote {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.2rem 0.52rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+.testimonial-vote-true {
+  background: rgba(212, 255, 227, 0.1);
+  border-color: rgba(167, 255, 198, 0.25);
+  color: #c9ffd9;
+}
+
+.testimonial-vote-false {
+  background: rgba(255, 221, 221, 0.08);
+  border-color: rgba(255, 174, 174, 0.24);
+  color: #ffd2d2;
+}
+
+.testimonial-rationale-label {
+  margin: 0;
+  font-size: 0.74rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #9bb0d8;
+}
+
+.testimonial-text {
+  margin: 0.2rem 0 0;
+  color: #e5ebff;
+}
+
+.comments-panel {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.comments-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+}
+
+.comments-head h3 {
+  margin: 0;
+}
+
+.comments-count {
+  min-width: 2.1rem;
+  text-align: center;
+  border-radius: 999px;
+  border: 1px solid var(--ring);
+  padding: 0.12rem 0.52rem;
+  font-size: 0.8rem;
+  color: #dbe5ff;
+  background: rgba(155, 176, 216, 0.1);
+}
+
+.comments-empty {
+  border: 1px dashed var(--ring);
+  border-radius: 12px;
+  padding: 0.7rem;
+  background: rgba(15, 23, 43, 0.45);
 }
 
 .chart-wrap {

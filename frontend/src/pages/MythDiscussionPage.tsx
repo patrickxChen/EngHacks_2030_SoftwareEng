@@ -12,6 +12,7 @@ export function MythDiscussionPage(): JSX.Element {
   const [myth, setMyth] = useState<Myth | null>(null);
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState("");
+  const [commentVote, setCommentVote] = useState<"true" | "false">("true");
   const [commenting, setCommenting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -25,7 +26,7 @@ export function MythDiscussionPage(): JSX.Element {
 
       try {
         const rows = await fetchMyths({ limit: 100 });
-        const merged = [...templateMyths, ...rows];
+        const merged = rows.length ? rows : templateMyths;
         const match = merged.find((entry) => entry.id === mythId) ?? null;
 
         if (active) {
@@ -74,23 +75,32 @@ export function MythDiscussionPage(): JSX.Element {
       setCommenting(true);
       await addTestimonial(myth.id, {
         buildingCode: myth.buildingCode,
-        text: commentText.trim()
+        text: commentText.trim(),
+        voteValue: commentVote === "true" ? 1 : -1
       });
+
+      const nextVoteValue: 1 | -1 = commentVote === "true" ? 1 : -1;
 
       const nextTestimonial = {
         id: `local-${Date.now()}`,
         userName: "You",
         buildingCode: myth.buildingCode,
         text: commentText.trim(),
+        voteValue: nextVoteValue,
         createdAt: new Date().toISOString()
       };
 
+      const wasUp = commentVote === "true";
+
       setMyth({
         ...myth,
+        votesUp: myth.votesUp + (wasUp ? 1 : 0),
+        votesDown: myth.votesDown + (wasUp ? 0 : 1),
         testimonialCount: myth.testimonialCount + 1,
         testimonials: [nextTestimonial, ...myth.testimonials]
       });
       setCommentText("");
+      setCommentVote("true");
       setMessage("Comment added.");
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Failed to add comment.");
@@ -127,19 +137,32 @@ export function MythDiscussionPage(): JSX.Element {
       <p className="myth-text">{myth.text}</p>
       <VoteWidget mythId={myth.id} initialUp={myth.votesUp} initialDown={myth.votesDown} />
 
-      <section>
-        <h3>Comments</h3>
+      <section className="comments-panel">
+        <div className="comments-head">
+          <h3>Comments</h3>
+          <span className="comments-count">{myth.testimonialCount}</span>
+        </div>
         <TestimonialList testimonials={myth.testimonials} />
       </section>
 
       <form className="myth-form" onSubmit={(event) => void handleCommentSubmit(event)}>
         <label>
-          Add a comment
+          Your vote
+          <select
+            value={commentVote}
+            onChange={(event) => setCommentVote(event.target.value as "true" | "false")}
+          >
+            <option value="true">True</option>
+            <option value="false">False</option>
+          </select>
+        </label>
+        <label>
+          Rationale
           <textarea
             rows={3}
             value={commentText}
             onChange={(event) => setCommentText(event.target.value)}
-            placeholder="Share your experience or counterexample..."
+            placeholder="Explain why you voted true or false..."
           />
         </label>
         {error ? <p className="form-error">{error}</p> : null}

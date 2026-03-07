@@ -37,12 +37,7 @@ export function MythsPage(): JSX.Element {
         });
 
         if (active) {
-          const merged = [...templateMyths, ...rows];
-          const byId = new Map<string, Myth>();
-          for (const myth of merged) {
-            byId.set(myth.id, myth);
-          }
-          setMyths(Array.from(byId.values()));
+          setMyths(rows.length ? rows : templateMyths);
         }
       } catch (err) {
         if (active) {

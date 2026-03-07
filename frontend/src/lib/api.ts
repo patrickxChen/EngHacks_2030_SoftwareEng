@@ -122,7 +122,7 @@ export async function castVote(mythId: string, value: 1 | -1): Promise<void> {
 
 export async function addTestimonial(
   mythId: string,
-  payload: { buildingCode: string; text: string }
+  payload: { buildingCode: string; text: string; voteValue: 1 | -1 }
 ): Promise<{ testimonialId: string }> {
   const data = await request<{ mythId: string; testimonialId: string }>(
     `/api/myths/${mythId}/testimonials`,

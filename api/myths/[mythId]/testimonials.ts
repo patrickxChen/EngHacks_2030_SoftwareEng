@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { FieldValue } from "firebase-admin/firestore";
-import { getDb, resolveUserId } from "../../_lib/firebaseAdmin";
+import { getDb, isFirebaseConfigured, resolveUserId } from "../../_lib/firebaseAdmin";
 import { jsonError, jsonOk } from "../../_lib/http";
 import { testimonialRequestSchema } from "../../_lib/schemas";
 
@@ -31,8 +31,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
+  if (!isFirebaseConfigured()) {
+    jsonOk(res, { mythId, testimonialId: `demo-${Date.now()}`, mode: "demo" });
+    return;
+  }
+
   const db = getDb();
   const mythRef = db.collection("myths").doc(mythId);
+  const voteRef = mythRef.collection("votes").doc(uid);
 
   try {
     const mythSnap = await mythRef.get();
@@ -43,16 +49,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
     const testimonialRef = mythRef.collection("testimonials").doc();
     await db.runTransaction(async (tx: FirebaseFirestore.Transaction) => {
+      const voteSnap = await tx.get(voteRef);
+      const nextVote = body.data.voteValue;
+      const previousVote = voteSnap.exists ? Number(voteSnap.data()?.value ?? 0) : 0;
+      const upDelta = (nextVote === 1 ? 1 : 0) - (previousVote === 1 ? 1 : 0);
+      const downDelta = (nextVote === -1 ? 1 : 0) - (previousVote === -1 ? 1 : 0);
+
       tx.set(testimonialRef, {
         userId: uid,
         buildingCode: body.data.buildingCode,
         text: body.data.text,
+        voteValue: nextVote,
         createdAt: FieldValue.serverTimestamp()
       });
 
       tx.set(
+        voteRef,
+        {
+          value: nextVote,
+          updatedAt: FieldValue.serverTimestamp()
+        },
+        { merge: true }
+      );
+
+      tx.set(
         mythRef,
         {
+          votesUp: FieldValue.increment(upDelta),
+          votesDown: FieldValue.increment(downDelta),
           testimonialCount: FieldValue.increment(1),
           updatedAt: FieldValue.serverTimestamp()
         },

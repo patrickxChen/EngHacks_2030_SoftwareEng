@@ -26,6 +26,7 @@ export const templateMyths: Myth[] = [
         userName: "MechMaya",
         buildingCode: "E7",
         text: "Came in for one bug, left with a whole new personality.",
+        voteValue: 1,
         createdAt: "2026-03-01T17:12:00Z"
       },
       {
@@ -33,6 +34,7 @@ export const templateMyths: Myth[] = [
         userName: "NanoNoah",
         buildingCode: "E7",
         text: "If your code works first try, check if you're in the wrong room.",
+        voteValue: 1,
         createdAt: "2026-03-01T18:40:00Z"
       }
     ]
@@ -60,6 +62,7 @@ export const templateMyths: Myth[] = [
         userName: "CSCass",
         buildingCode: "RCH",
         text: "Great lectures, but the 15% myth is pure coping energy.",
+        voteValue: -1,
         createdAt: "2026-03-02T10:22:00Z"
       }
     ]
@@ -87,6 +90,7 @@ export const templateMyths: Myth[] = [
         userName: "CSCass",
         buildingCode: "DC",
         text: "Found one seat once. It was in a dream.",
+        voteValue: -1,
         createdAt: "2026-03-03T10:22:00Z"
       }
     ]

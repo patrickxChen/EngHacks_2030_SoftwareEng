@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { FieldValue } from "firebase-admin/firestore";
-import { getDb, resolveUserId } from "../_lib/firebaseAdmin";
+import { getDb, isFirebaseConfigured, resolveUserId } from "../_lib/firebaseAdmin";
 import { jsonError, jsonOk } from "../_lib/http";
 import { createMythRequestSchema } from "../_lib/schemas";
 import { generateVerdict } from "../_lib/verdict";
@@ -60,6 +60,11 @@ async function handleGetMyths(req: VercelRequest, res: VercelResponse): Promise<
   const rawLimit = Number.parseInt(queryValue(req.query.limit) || "50", 10);
   const limit = Number.isFinite(rawLimit) ? Math.max(1, Math.min(rawLimit, 100)) : 50;
 
+  if (!isFirebaseConfigured()) {
+    jsonOk(res, { myths: [], mode: "demo", limit });
+    return;
+  }
+
   try {
     const snap = await db.collection("myths").orderBy("createdAt", "desc").limit(limit).get();
     const filteredDocs = snap.docs.filter((doc) => {
@@ -111,6 +116,7 @@ async function handleGetMyths(req: VercelRequest, res: VercelResponse): Promise<
                     userName: String(value.userName ?? value.userId ?? "Anonymous"),
                     buildingCode: String(value.buildingCode ?? data.buildingCode ?? ""),
                     text: String(value.text ?? ""),
+                    voteValue: Number(value.voteValue ?? 1) === -1 ? -1 : 1,
                     createdAt: toIso(value.createdAt)
                   };
                 })
@@ -167,6 +173,19 @@ async function handleCreateMyth(req: VercelRequest, res: VercelResponse): Promis
   const input = parsed.data;
   const resolvedBuildingCode =
     input.scopeType === "building" ? input.buildingCode ?? input.scopeKey : input.buildingCode ?? "COURSE";
+
+  if (!isFirebaseConfigured()) {
+    jsonOk(res, {
+      mythId: `demo-${Date.now()}`,
+      verdict: {
+        verdictLabel: "MIXED",
+        verdictReason: "Demo mode: Firebase is not configured, so this submission is not persisted.",
+        confidenceScore: 0
+      },
+      mode: "demo"
+    });
+    return;
+  }
 
   try {
     await mythRef.set({

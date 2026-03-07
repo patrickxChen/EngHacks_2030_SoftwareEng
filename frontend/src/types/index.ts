@@ -6,6 +6,7 @@ export interface Testimonial {
   userName: string;
   buildingCode: string;
   text: string;
+  voteValue: 1 | -1;
   createdAt: string;
 }
 
