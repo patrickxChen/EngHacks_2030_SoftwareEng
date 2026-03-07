@@ -2,10 +2,12 @@ import type { BuildingStat, Myth, NotificationItem, Report } from "../types";
 
 export const buildings = ["E7", "E2", "DC", "RCH", "CPH", "DWE"];
 
-export const myths: Myth[] = [
+export const templateMyths: Myth[] = [
   {
-    id: "m1",
-    text: "ECE labs in E7 always take 6 hours.",
+    id: "tmpl-course-1",
+    scopeType: "course",
+    scopeKey: "ECE 198",
+    text: "ECE 198 labs usually run longer than scheduled in E7.",
     buildingCode: "E7",
     programTag: "ECE",
     courseTag: "ECE 198",
@@ -14,8 +16,8 @@ export const myths: Myth[] = [
     verdictReason:
       "Anyone who has wrestled with a microcontroller in E7 after midnight has lived this timeline.",
     confidenceScore: 0.83,
-    votesUp: 128,
-    votesDown: 24,
+    votesUp: 142,
+    votesDown: 27,
     testimonialCount: 2,
     createdAt: "2026-03-01T12:00:00Z",
     testimonials: [
@@ -24,6 +26,7 @@ export const myths: Myth[] = [
         userName: "MechMaya",
         buildingCode: "E7",
         text: "Came in for one bug, left with a whole new personality.",
+        voteValue: 1,
         createdAt: "2026-03-01T17:12:00Z"
       },
       {
@@ -31,12 +34,43 @@ export const myths: Myth[] = [
         userName: "NanoNoah",
         buildingCode: "E7",
         text: "If your code works first try, check if you're in the wrong room.",
+        voteValue: 1,
         createdAt: "2026-03-01T18:40:00Z"
       }
     ]
   },
   {
-    id: "m2",
+    id: "tmpl-prof-1",
+    scopeType: "prof",
+    scopeKey: "Prof. Martin",
+    text: "Prof. Martin curves every midterm by at least 15%.",
+    buildingCode: "RCH",
+    programTag: "SE",
+    profTag: "Prof. Martin",
+    tone: "funny",
+    verdictLabel: "LIKELY_FALSE",
+    verdictReason:
+      "Historical grade snapshots suggest occasional small adjustments, not a guaranteed mega-curve.",
+    confidenceScore: 0.88,
+    votesUp: 31,
+    votesDown: 121,
+    testimonialCount: 1,
+    createdAt: "2026-03-02T09:00:00Z",
+    testimonials: [
+      {
+        id: "t3",
+        userName: "CSCass",
+        buildingCode: "RCH",
+        text: "Great lectures, but the 15% myth is pure coping energy.",
+        voteValue: -1,
+        createdAt: "2026-03-02T10:22:00Z"
+      }
+    ]
+  },
+  {
+    id: "tmpl-building-1",
+    scopeType: "building",
+    scopeKey: "DC",
     text: "You can always find a quiet seat in DC during midterm season.",
     buildingCode: "DC",
     programTag: "SE",
@@ -46,8 +80,8 @@ export const myths: Myth[] = [
     verdictReason:
       "DC silence is a scarce resource in October. Odds improve only before sunrise.",
     confidenceScore: 0.9,
-    votesUp: 91,
-    votesDown: 11,
+    votesUp: 18,
+    votesDown: 133,
     testimonialCount: 1,
     createdAt: "2026-03-03T09:00:00Z",
     testimonials: [
@@ -56,27 +90,11 @@ export const myths: Myth[] = [
         userName: "CSCass",
         buildingCode: "DC",
         text: "Found one seat once. It was in a dream.",
+        voteValue: -1,
         createdAt: "2026-03-03T10:22:00Z"
       }
     ]
   },
-  {
-    id: "m3",
-    text: "RCH has the best whiteboards for solving impossible assignments.",
-    buildingCode: "RCH",
-    programTag: "SYDE",
-    courseTag: "MATH 239",
-    tone: "serious",
-    verdictLabel: "MIXED",
-    verdictReason:
-      "The whiteboards are elite, but finding one that is free is a questline.",
-    confidenceScore: 0.64,
-    votesUp: 66,
-    votesDown: 19,
-    testimonialCount: 0,
-    createdAt: "2026-03-04T11:15:00Z",
-    testimonials: []
-  }
 ];
 
 export const buildingStats: BuildingStat[] = [

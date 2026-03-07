@@ -10,11 +10,9 @@ interface AppLayoutProps {
 }
 
 const navItems = [
-  { label: "Home", href: "/" },
+  { label: "Daily Digest", href: "/home" },
   { label: "Submit", href: "/submit" },
-  { label: "Myths", href: "/myths" },
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Map", href: "/map" }
+  { label: "Search", href: "/search" }
 ];
 
 export function AppLayout({ children, loggedInEmail, onLogout }: AppLayoutProps): JSX.Element {
@@ -26,7 +24,7 @@ export function AppLayout({ children, loggedInEmail, onLogout }: AppLayoutProps)
             <img src={ghostImg} alt="Ghost mascot" className="brand-ghost" />
             <div>
               <p className="brand-kicker">Waterloo Engineering</p>
-              <h1>Myth Buster</h1>
+              <h1>EngBusters</h1>
             </div>
           </div>
         </div>

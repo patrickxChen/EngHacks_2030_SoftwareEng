@@ -2,6 +2,10 @@ import admin from "firebase-admin";
 
 let initialized = false;
 
+export function isFirebaseConfigured(): boolean {
+  return Boolean(process.env.FIREBASE_PROJECT_ID && process.env.FIREBASE_SERVICE_ACCOUNT_JSON);
+}
+
 function initializeAdmin(): void {
   if (initialized) {
     return;
@@ -47,4 +51,43 @@ export async function verifyAuthToken(authHeader?: string): Promise<string | nul
   } catch {
     return null;
   }
+}
+
+function normalizeHeaderValue(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+}
+
+function normalizeDemoUserId(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 40);
+}
+
+export async function resolveUserId(input: {
+  authHeader?: string | string[];
+  demoUserIdHeader?: string | string[];
+}): Promise<string | null> {
+  const uid = await verifyAuthToken(normalizeHeaderValue(input.authHeader));
+  if (uid) {
+    return uid;
+  }
+
+  // Default demo auth to enabled for hackathon/demo flows unless explicitly disabled.
+  const allowDemoAuth =
+    process.env.ALLOW_DEMO_AUTH !== "false" ||
+    process.env.ALLOW_UNAUTHENTICATED_LOCAL === "true" ||
+    process.env.VERCEL_ENV === "preview";
+
+  if (!allowDemoAuth) {
+    return null;
+  }
+
+  const normalizedDemoId = normalizeDemoUserId(normalizeHeaderValue(input.demoUserIdHeader));
+  if (!normalizedDemoId) {
+    return "demo-anonymous";
+  }
+
+  return `demo-${normalizedDemoId}`;
 }

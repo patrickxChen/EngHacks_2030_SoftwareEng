@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import type { Myth } from "../types";
 import { BuildingBadge } from "./BuildingBadge";
 import { VerdictBadge } from "./VerdictBadge";
@@ -7,10 +8,23 @@ interface PostCardProps {
 }
 
 export function PostCard({ myth }: PostCardProps): JSX.Element {
+  const navigate = useNavigate();
   const firstReply = myth.testimonials[0];
 
   return (
-    <article className="post-card">
+    <article
+      className="post-card post-card-clickable"
+      onClick={() => navigate(`/myth/${myth.id}`)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          navigate(`/myth/${myth.id}`);
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label="Open myth discussion"
+    >
       <header className="post-card-head">
         <p className="post-title">{myth.text}</p>
         <button type="button" className="menu-dot-btn" aria-label="Open post actions">
@@ -30,14 +44,20 @@ export function PostCard({ myth }: PostCardProps): JSX.Element {
         <VerdictBadge verdict={myth.verdictLabel} />
       </div>
 
-      <div className="post-actions">
-        <button type="button" className="vote-btn vote-icon-btn" aria-label="Upvote post">
-          ↗
+      <div className="post-actions" onClick={(event) => event.stopPropagation()}>
+        <button type="button" className="vote-btn vote-icon-btn vote-btn-true" aria-label="Mark post true">
+          <span>True ▲</span>
+          <span className="vote-count" aria-hidden="true">
+            {myth.votesUp}
+          </span>
         </button>
-        <button type="button" className="vote-btn vote-icon-btn" aria-label="Downvote post">
-          ↘
+        <button type="button" className="vote-btn vote-icon-btn vote-btn-false" aria-label="Mark post false">
+          <span>False ▼</span>
+          <span className="vote-count" aria-hidden="true">
+            {myth.votesDown}
+          </span>
         </button>
-        <button type="button" className="vote-btn">
+        <button type="button" className="vote-btn post-reply-btn">
           Reply
         </button>
       </div>

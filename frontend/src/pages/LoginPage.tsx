@@ -23,7 +23,7 @@ export function LoginPage({ onLogin }: LoginPageProps): JSX.Element {
   return (
     <section className="login-page page-enter">
       <div className="login-card">
-        <p className="brand-kicker">Waterloo Engineering Myth Buster</p>
+        <p className="brand-kicker">EngBusters</p>
         <h2>Login</h2>
         <p className="muted-text">Limit access to UW students.</p>
 

@@ -6,19 +6,21 @@ export interface Testimonial {
   userName: string;
   buildingCode: string;
   text: string;
+  voteValue: 1 | -1;
   createdAt: string;
 }
 
 export interface Myth {
   id: string;
   authorId?: string;
-  scopeType?: "course" | "building";
+  scopeType?: "course" | "prof" | "building";
   scopeKey?: string;
   status?: string;
   text: string;
   buildingCode: string;
   programTag?: string;
   courseTag?: string;
+  profTag?: string;
   tone: Tone;
   verdictLabel: VerdictLabel;
   verdictReason: string;

@@ -44,7 +44,7 @@ export function ResultsPage(): JSX.Element {
     <section className="page-enter">
       <div className="results-head">
         <h2>Results {query ? `for "${query}"` : ""}</h2>
-        <Link to="/" className="btn">
+          <Link to="/home" className="btn">
           Back Home
         </Link>
       </div>

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { FieldValue } from "firebase-admin/firestore";
-import { getDb, verifyAuthToken } from "../../_lib/firebaseAdmin";
+import { getDb, isFirebaseConfigured, resolveUserId } from "../../_lib/firebaseAdmin";
 import { jsonError, jsonOk } from "../../_lib/http";
 import { voteRequestSchema } from "../../_lib/schemas";
 
@@ -10,7 +10,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const uid = await verifyAuthToken(req.headers.authorization);
+  const uid = await resolveUserId({
+    authHeader: req.headers.authorization,
+    demoUserIdHeader: req.headers["x-demo-user-id"]
+  });
   if (!uid) {
     jsonError(res, 401, "UNAUTHORIZED", "Missing or invalid auth token.");
     return;
@@ -25,6 +28,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   const body = voteRequestSchema.safeParse(req.body);
   if (!body.success) {
     jsonError(res, 400, "BAD_REQUEST", "Vote payload must include value: 1 or -1.");
+    return;
+  }
+
+  if (!isFirebaseConfigured()) {
+    jsonOk(res, { mythId, vote: body.data.value, mode: "demo" });
     return;
   }
 

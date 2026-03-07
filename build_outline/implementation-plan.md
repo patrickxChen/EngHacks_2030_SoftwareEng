@@ -47,7 +47,7 @@ Build a web app where Waterloo Engineering students can submit and vote on build
 - Save to Firestore
 
 ## Milestone 2 - Verdict Engine + Myth Feed (Day 3)
-- Build Vercel API route to generate verdict from myth + context
+- Build serverless function to generate verdict from myth + context
 - Add myth feed with filters (building, program, course)
 - Render verdict badge + reason
 
@@ -76,7 +76,7 @@ Build a web app where Waterloo Engineering students can submit and vote on build
 
 ## Backend Tasks
 - Firestore collections and indexes
-- Vercel API routes:
+- Cloud Functions:
 	- verdict generation
 	- vote handling
 	- aggregate stats updates
@@ -120,7 +120,7 @@ Build a web app where Waterloo Engineering students can submit and vote on build
 	- Mitigation: per-user vote docs + transaction checks + Firebase rules.
 
 ## 9. Deliverables
-- Deployed web app/API (Vercel)
+- Deployed web app (Firebase Hosting)
 - Source code with modular structure
 - Updated architecture/design/progress docs
 - Demo script with UW-building examples
