@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { castVote } from "../lib/api";
 
 interface VoteWidgetProps {
@@ -14,8 +14,6 @@ export function VoteWidget({ mythId, initialUp, initialDown }: VoteWidgetProps):
   const [upCount, setUpCount] = useState(initialUp);
   const [downCount, setDownCount] = useState(initialDown);
   const [pending, setPending] = useState(false);
-
-  const score = useMemo(() => upCount - downCount, [upCount, downCount]);
 
   const handleVote = async (nextVote: VoteState): Promise<void> => {
     if (!nextVote || nextVote === vote || pending) {
@@ -56,30 +54,46 @@ export function VoteWidget({ mythId, initialUp, initialDown }: VoteWidgetProps):
   };
 
   return (
-    <div className="vote-widget" role="group" aria-label="Vote on this myth">
-      <button
-        className={vote === "up" ? "vote-btn vote-btn-active vote-icon-btn" : "vote-btn vote-icon-btn"}
-        onClick={() => void handleVote("up")}
-        aria-label="Upvote myth"
-        type="button"
-        disabled={pending}
-      >
-        ↗
-      </button>
-      <span className="vote-score" aria-live="polite">
-        Score {score}
-      </span>
-      <button
-        className={
-          vote === "down" ? "vote-btn vote-btn-active vote-icon-btn" : "vote-btn vote-icon-btn"
-        }
-        onClick={() => void handleVote("down")}
-        aria-label="Downvote myth"
-        type="button"
-        disabled={pending}
-      >
-        ↘
-      </button>
+    <div
+      className="vote-widget"
+      role="group"
+      aria-label="Vote on this myth"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <div className="vote-segment">
+        <button
+          className={
+            vote === "up"
+              ? "vote-btn vote-btn-active vote-icon-btn vote-btn-true"
+              : "vote-btn vote-icon-btn vote-btn-true"
+          }
+          onClick={() => void handleVote("up")}
+          aria-label="Vote true"
+          type="button"
+          disabled={pending}
+        >
+          <span>True ▲</span>
+          <span className="vote-count" aria-hidden="true">
+            {upCount}
+          </span>
+        </button>
+        <button
+          className={
+            vote === "down"
+              ? "vote-btn vote-btn-active vote-icon-btn vote-btn-false"
+              : "vote-btn vote-icon-btn vote-btn-false"
+          }
+          onClick={() => void handleVote("down")}
+          aria-label="Vote false"
+          type="button"
+          disabled={pending}
+        >
+          <span>False ▼</span>
+          <span className="vote-count" aria-hidden="true">
+            {downCount}
+          </span>
+        </button>
+      </div>
     </div>
   );
 }

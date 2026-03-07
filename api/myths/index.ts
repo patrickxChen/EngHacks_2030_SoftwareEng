@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { FieldValue } from "firebase-admin/firestore";
-import { getDb, verifyAuthToken } from "../_lib/firebaseAdmin";
+import { getDb, resolveUserId } from "../_lib/firebaseAdmin";
 import { jsonError, jsonOk } from "../_lib/http";
 import { createMythRequestSchema } from "../_lib/schemas";
 import { generateVerdict } from "../_lib/verdict";
@@ -40,7 +40,10 @@ function toIso(value: unknown): string {
 }
 
 async function handleGetMyths(req: VercelRequest, res: VercelResponse): Promise<void> {
-  const uid = await verifyAuthToken(req.headers.authorization);
+  const uid = await resolveUserId({
+    authHeader: req.headers.authorization,
+    demoUserIdHeader: req.headers["x-demo-user-id"]
+  });
   if (!uid) {
     jsonError(res, 401, "UNAUTHORIZED", "Missing or invalid auth token.");
     return;
@@ -144,7 +147,10 @@ async function handleGetMyths(req: VercelRequest, res: VercelResponse): Promise<
 }
 
 async function handleCreateMyth(req: VercelRequest, res: VercelResponse): Promise<void> {
-  const uid = await verifyAuthToken(req.headers.authorization);
+  const uid = await resolveUserId({
+    authHeader: req.headers.authorization,
+    demoUserIdHeader: req.headers["x-demo-user-id"]
+  });
   if (!uid) {
     jsonError(res, 401, "UNAUTHORIZED", "Missing or invalid auth token.");
     return;

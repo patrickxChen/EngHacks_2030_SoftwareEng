@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { FieldValue } from "firebase-admin/firestore";
-import { getDb, verifyAuthToken } from "../../_lib/firebaseAdmin";
+import { getDb, resolveUserId } from "../../_lib/firebaseAdmin";
 import { jsonError, jsonOk } from "../../_lib/http";
 import { testimonialRequestSchema } from "../../_lib/schemas";
 
@@ -10,7 +10,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
-  const uid = await verifyAuthToken(req.headers.authorization);
+  const uid = await resolveUserId({
+    authHeader: req.headers.authorization,
+    demoUserIdHeader: req.headers["x-demo-user-id"]
+  });
   if (!uid) {
     jsonError(res, 401, "UNAUTHORIZED", "Missing or invalid auth token.");
     return;

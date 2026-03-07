@@ -48,3 +48,41 @@ export async function verifyAuthToken(authHeader?: string): Promise<string | nul
     return null;
   }
 }
+
+function normalizeHeaderValue(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) {
+    return value[0] ?? "";
+  }
+
+  return value ?? "";
+}
+
+function normalizeDemoUserId(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 40);
+}
+
+export async function resolveUserId(input: {
+  authHeader?: string | string[];
+  demoUserIdHeader?: string | string[];
+}): Promise<string | null> {
+  const uid = await verifyAuthToken(normalizeHeaderValue(input.authHeader));
+  if (uid) {
+    return uid;
+  }
+
+  const allowDemoAuth =
+    process.env.ALLOW_DEMO_AUTH === "true" ||
+    process.env.ALLOW_UNAUTHENTICATED_LOCAL === "true" ||
+    process.env.VERCEL_ENV === "preview";
+
+  if (!allowDemoAuth) {
+    return null;
+  }
+
+  const normalizedDemoId = normalizeDemoUserId(normalizeHeaderValue(input.demoUserIdHeader));
+  if (!normalizedDemoId) {
+    return "demo-anonymous";
+  }
+
+  return `demo-${normalizedDemoId}`;
+}
