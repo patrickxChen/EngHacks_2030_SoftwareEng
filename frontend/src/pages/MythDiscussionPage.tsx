@@ -1,62 +1,34 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { BuildingBadge } from "../components/BuildingBadge";
 import { TestimonialList } from "../components/TestimonialList";
 import { VoteWidget } from "../components/VoteWidget";
 import { templateMyths } from "../data/mockData";
-import { addTestimonial, fetchMyths } from "../lib/api";
+import { addTestimonial } from "../lib/api";
 import type { Myth } from "../types";
 
-export function MythDiscussionPage(): JSX.Element {
+interface MythDiscussionPageProps {
+  myths: Myth[];
+  setMyths: React.Dispatch<React.SetStateAction<Myth[]>>;
+}
+
+export function MythDiscussionPage({ myths, setMyths }: MythDiscussionPageProps): JSX.Element {
   const { mythId = "" } = useParams();
-  const [myth, setMyth] = useState<Myth | null>(null);
-  const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState("");
+  const [commentVote, setCommentVote] = useState<"true" | "false">("true");
   const [commenting, setCommenting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    let active = true;
-
-    const run = async (): Promise<void> => {
-      setLoading(true);
-      setError("");
-
-      try {
-        const rows = await fetchMyths({ limit: 100 });
-        const merged = [...templateMyths, ...rows];
-        const match = merged.find((entry) => entry.id === mythId) ?? null;
-
-        if (active) {
-          setMyth(match);
-        }
-      } catch {
-        const match = templateMyths.find((entry) => entry.id === mythId) ?? null;
-        if (active) {
-          setMyth(match);
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    };
-
-    void run();
-
-    return () => {
-      active = false;
-    };
-  }, [mythId]);
+  // Find myth from shared state instead of fetching
+  const myth = useMemo(() => {
+    const found = myths.find((entry) => entry.id === mythId);
+    return found ?? templateMyths.find((entry) => entry.id === mythId) ?? null;
+  }, [myths, mythId]);
 
   const commentError = useMemo(() => {
-    if (!commentText.trim()) {
-      return "Comment text is required.";
-    }
-    if (commentText.trim().length < 6) {
-      return "Comment should be at least 6 characters.";
-    }
+    if (!commentText.trim()) return "Comment text is required.";
+    if (commentText.trim().length < 6) return "Comment should be at least 6 characters.";
     return "";
   }, [commentText]);
 
@@ -72,36 +44,51 @@ export function MythDiscussionPage(): JSX.Element {
 
     try {
       setCommenting(true);
-      await addTestimonial(myth.id, {
-        buildingCode: myth.buildingCode,
-        text: commentText.trim()
-      });
+      const isTemplateMyth = myth.id.startsWith("tmpl-");
+      if (!isTemplateMyth) {
+        await addTestimonial(myth.id, {
+          buildingCode: myth.buildingCode,
+          text: commentText.trim(),
+          voteValue: commentVote === "true" ? 1 : -1
+        });
+      }
+
+      const nextVoteValue: 1 | -1 = commentVote === "true" ? 1 : -1;
+      const wasUp = commentVote === "true";
 
       const nextTestimonial = {
         id: `local-${Date.now()}`,
         userName: "You",
         buildingCode: myth.buildingCode,
         text: commentText.trim(),
+        voteValue: nextVoteValue,
         createdAt: new Date().toISOString()
       };
 
-      setMyth({
-        ...myth,
-        testimonialCount: myth.testimonialCount + 1,
-        testimonials: [nextTestimonial, ...myth.testimonials]
-      });
+      // Update shared myths state so HomePage and MythsPage stay in sync
+      setMyths((prev) =>
+        prev.map((m) =>
+          m.id === myth.id
+            ? {
+                ...m,
+                votesUp: m.votesUp + (wasUp ? 1 : 0),
+                votesDown: m.votesDown + (wasUp ? 0 : 1),
+                testimonialCount: m.testimonialCount + 1,
+                testimonials: [nextTestimonial, ...m.testimonials]
+              }
+            : m
+        )
+      );
+
       setCommentText("");
-      setMessage("Comment added.");
+      setCommentVote("true");
+      setMessage(isTemplateMyth ? "Comment added to example myth." : "Comment added.");
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Failed to add comment.");
     } finally {
       setCommenting(false);
     }
   };
-
-  if (loading) {
-    return <section className="page-enter"><p className="muted-text">Loading discussion...</p></section>;
-  }
 
   if (!myth) {
     return (
@@ -125,21 +112,47 @@ export function MythDiscussionPage(): JSX.Element {
       </div>
 
       <p className="myth-text">{myth.text}</p>
-      <VoteWidget mythId={myth.id} initialUp={myth.votesUp} initialDown={myth.votesDown} />
+      <VoteWidget
+        mythId={myth.id}
+        initialUp={myth.votesUp}
+        initialDown={myth.votesDown}
+        onVote={(upDelta, downDelta) => {
+          setMyths((prev) =>
+            prev.map((m) =>
+              m.id === myth.id
+                ? { ...m, votesUp: m.votesUp + upDelta, votesDown: m.votesDown + downDelta }
+                : m
+            )
+          );
+        }}
+      />
 
-      <section>
-        <h3>Comments</h3>
+      <section className="comments-panel">
+        <div className="comments-head">
+          <h3>Comments</h3>
+          <span className="comments-count">{myth.testimonialCount}</span>
+        </div>
         <TestimonialList testimonials={myth.testimonials} />
       </section>
 
       <form className="myth-form" onSubmit={(event) => void handleCommentSubmit(event)}>
         <label>
-          Add a comment
+          Your vote
+          <select
+            value={commentVote}
+            onChange={(event) => setCommentVote(event.target.value as "true" | "false")}
+          >
+            <option value="true">True</option>
+            <option value="false">False</option>
+          </select>
+        </label>
+        <label>
+          Rationale
           <textarea
             rows={3}
             value={commentText}
             onChange={(event) => setCommentText(event.target.value)}
-            placeholder="Share your experience or counterexample..."
+            placeholder="Explain why you voted true or false..."
           />
         </label>
         {error ? <p className="form-error">{error}</p> : null}

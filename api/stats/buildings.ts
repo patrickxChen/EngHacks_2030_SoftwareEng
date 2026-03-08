@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getDb, verifyAuthToken } from "../_lib/firebaseAdmin";
-import { jsonError, jsonOk } from "../_lib/http";
+import { getDb, verifyAuthToken } from "../_lib/firebaseAdmin.js";
+import { jsonError, jsonOk } from "../_lib/http.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (req.method !== "GET") {

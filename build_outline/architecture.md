@@ -1,31 +1,31 @@
 # Waterloo Engineering Myth Buster - Architecture
 
 ## 1. System Overview
-The system is a React web app with a Vercel-hosted TypeScript API. Students authenticate, submit building-specific myths, vote, and leave testimonials. API routes generate verdicts and maintain aggregate building stats used by charts and map views.
+The system is a Firebase-backed React web app. Students authenticate, submit building-specific myths, vote, and leave testimonials. Cloud Functions generate verdicts and maintain aggregate building stats used by charts and map views.
 
 ## 2. High-Level Components
 1. Web Client (React + Tailwind)
 - Submission form, myth feed, dashboard charts, map view, profile, admin tools.
 
-2. Backend Services
+2. Backend Services (Firebase)
 - Firestore: source of truth for myths, users, votes, testimonials, and aggregates.
-- Vercel API routes (`api/*.ts`): verdict generation, voting logic, stats reads/updates, moderation automation.
+- Cloud Functions: verdict generation, voting logic, stats updates, moderation automation.
 - Firebase Auth: identity and role claims.
-- Vercel: deployment target for API (and frontend when ready).
+- Firebase Hosting: frontend hosting.
 
 3. AI Integration
-- OpenAI API called from Vercel API routes only.
+- OpenAI API called from Cloud Functions only.
 - Prompt built from myth text + building + program/course tags.
 
 ## 3. Data Flow
 1. User submits myth with building and context.
 2. Myth stored as `pending_verdict`.
-3. API triggers verdict generation and writes:
+3. Function triggers verdict generation and writes:
 - `verdictLabel` (`LIKELY_TRUE`, `LIKELY_FALSE`, `MIXED`)
 - `verdictReason`
 - `confidenceScore`
 4. Feed updates live via Firestore listeners.
-5. Votes/testimonials trigger aggregate update handlers.
+5. Votes/testimonials trigger aggregate update function.
 6. Dashboard and map read from precomputed aggregate docs.
 
 ## 4. Firestore Schema
@@ -82,21 +82,24 @@ The system is a React web app with a Vercel-hosted TypeScript API. Students auth
 - `status: string` (`open`, `resolved`)
 - `createdAt: timestamp`
 
-## 5. API Handlers (Vercel)
-1. `POST /api/myths/generate-verdict`
-- Calls OpenAI and returns verdict fields.
+## 5. Cloud Functions
+1. `onMythCreateGenerateVerdict`
+- Trigger: new myth document.
+- Calls OpenAI, stores verdict fields.
 
-2. `POST /api/myths/:mythId/vote`
-- Enforces one vote per user per myth with Firestore transaction.
+2. `castVote`
+- Callable/HTTP endpoint.
+- Enforces one vote per user per myth with transaction.
 
-3. `POST /api/myths/:mythId/testimonials`
-- Validates content and creates testimonial doc.
+3. `addTestimonial`
+- Validates content and creates testimonial.
 
-4. `GET /api/stats/buildings`
-- Returns pre-aggregated `buildingStats` docs.
+4. `updateBuildingStats`
+- Triggered on myth/vote/testimonial changes.
+- Updates pre-aggregated `buildingStats` docs.
 
-5. `POST /api/moderation/report`
-- Creates moderation reports for flagged content.
+5. `moderateContent`
+- Optional auto-moderation for profanity/spam.
 
 ## 6. Security Model
 - Firestore rules enforce:
@@ -104,7 +107,7 @@ The system is a React web app with a Vercel-hosted TypeScript API. Students auth
 	- vote writes only to own `userId` doc
 	- no direct client write to aggregate stats
 	- moderator/admin-only delete or status updates
-- Vercel API handlers use service account credentials to perform trusted writes.
+- Cloud Functions use service account to perform trusted writes.
 
 ## 7. Performance Notes
 - Use composite indexes for `buildingCode + createdAt`, `programTag + buildingCode`.
@@ -113,6 +116,6 @@ The system is a React web app with a Vercel-hosted TypeScript API. Students auth
 
 ## 8. Deployment Topology
 - Single Firebase project for MVP (dev + prod can be split later).
-- Vercel serves API routes (and optionally frontend).
-- Keep Vercel region close to Firestore region for lower latency.
+- Hosting serves React app.
+- Functions and Firestore in same region for lower latency.
 

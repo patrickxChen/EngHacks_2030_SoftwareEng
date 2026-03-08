@@ -1,12 +1,16 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { FieldValue } from "firebase-admin/firestore";
-import { getDb, resolveUserId } from "../../_lib/firebaseAdmin";
-import { jsonError, jsonOk } from "../../_lib/http";
-import { voteRequestSchema } from "../../_lib/schemas";
+import { getDb, isFirebaseConfigured, resolveUserId } from "../../_lib/firebaseAdmin.js";
+import { jsonError, jsonOk } from "../../_lib/http.js";
+import { voteRequestSchema } from "../../_lib/schemas.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  if (req.method !== "POST") {
-    jsonError(res, 405, "METHOD_NOT_ALLOWED", "Use POST for this endpoint.");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-demo-user-id");
+
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
     return;
   }
 
@@ -28,6 +32,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   const body = voteRequestSchema.safeParse(req.body);
   if (!body.success) {
     jsonError(res, 400, "BAD_REQUEST", "Vote payload must include value: 1 or -1.");
+    return;
+  }
+
+  if (!isFirebaseConfigured()) {
+    jsonOk(res, { mythId, vote: body.data.value, mode: "demo" });
     return;
   }
 

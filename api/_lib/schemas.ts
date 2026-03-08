@@ -1,14 +1,15 @@
 import { z } from "zod";
 
-const scopeTypeSchema = z.enum(["course", "building"]);
+const scopeTypeSchema = z.enum(["course", "building", "prof"]);
 
 export const createMythRequestSchema = z
   .object({
     text: z.string().min(8).max(300),
     scopeType: scopeTypeSchema,
-    scopeKey: z.string().min(2).max(20),
+    scopeKey: z.string().min(2).max(60),
     programTag: z.string().max(40).optional().default(""),
     courseTag: z.string().max(20).optional().default(""),
+    profTag: z.string().max(60).optional().default(""),
     buildingCode: z.string().min(2).max(10).optional(),
     tone: z.enum(["funny", "serious"]).optional().default("funny")
   })
@@ -36,7 +37,8 @@ export const voteRequestSchema = z.object({
 
 export const testimonialRequestSchema = z.object({
   buildingCode: z.string().min(2).max(10),
-  text: z.string().min(4).max(400)
+  text: z.string().min(4).max(400),
+  voteValue: z.union([z.literal(1), z.literal(-1)])
 });
 
 export const reportRequestSchema = z.object({

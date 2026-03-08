@@ -5,12 +5,28 @@ interface VoteWidgetProps {
   mythId: string;
   initialUp: number;
   initialDown: number;
+  onVote?: (upDelta: number, downDelta: number) => void;
 }
 
 type VoteState = "up" | "down" | null;
 
-export function VoteWidget({ mythId, initialUp, initialDown }: VoteWidgetProps): JSX.Element {
-  const [vote, setVote] = useState<VoteState>(null);
+function loadVote(mythId: string): VoteState {
+  try {
+    return (localStorage.getItem(`vote:${mythId}`) as VoteState) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function saveVoteDirection(mythId: string, vote: VoteState): void {
+  try {
+    if (vote) localStorage.setItem(`vote:${mythId}`, vote);
+    else localStorage.removeItem(`vote:${mythId}`);
+  } catch { /* ignore */ }
+}
+
+export function VoteWidget({ mythId, initialUp, initialDown, onVote }: VoteWidgetProps): JSX.Element {
+  const [vote, setVote] = useState<VoteState>(() => loadVote(mythId));
   const [upCount, setUpCount] = useState(initialUp);
   const [downCount, setDownCount] = useState(initialDown);
   const [pending, setPending] = useState(false);
@@ -21,33 +37,23 @@ export function VoteWidget({ mythId, initialUp, initialDown }: VoteWidgetProps):
     }
 
     const previousVote = vote;
-    const previousUp = upCount;
-    const previousDown = downCount;
 
-    if (previousVote === "up") {
-      setUpCount((prev) => prev - 1);
-    }
-    if (previousVote === "down") {
-      setDownCount((prev) => prev - 1);
-    }
+    const newUpCount = upCount + (nextVote === "up" ? 1 : 0) - (previousVote === "up" ? 1 : 0);
+    const newDownCount = downCount + (nextVote === "down" ? 1 : 0) - (previousVote === "down" ? 1 : 0);
 
-    if (nextVote === "up") {
-      setUpCount((prev) => prev + 1);
-    }
-    if (nextVote === "down") {
-      setDownCount((prev) => prev + 1);
-    }
-
+    setUpCount(newUpCount);
+    setDownCount(newDownCount);
     setVote(nextVote);
+    saveVoteDirection(mythId, nextVote);
+    const upDelta = (nextVote === "up" ? 1 : 0) - (previousVote === "up" ? 1 : 0);
+    const downDelta = (nextVote === "down" ? 1 : 0) - (previousVote === "down" ? 1 : 0);
+    onVote?.(upDelta, downDelta);
 
     try {
       setPending(true);
       await castVote(mythId, nextVote === "up" ? 1 : -1);
     } catch {
-      // Revert optimistic state when request fails.
-      setVote(previousVote);
-      setUpCount(previousUp);
-      setDownCount(previousDown);
+      // Keep optimistic update — backend may be unavailable in demo mode.
     } finally {
       setPending(false);
     }

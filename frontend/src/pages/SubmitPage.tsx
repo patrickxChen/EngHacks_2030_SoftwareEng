@@ -22,6 +22,12 @@ const initialState: FormState = {
   tone: "funny"
 };
 
+const scopeOptions: Array<{ value: FormState["scopeType"]; label: string }> = [
+  { value: "building", label: "Building" },
+  { value: "course", label: "Course" },
+  { value: "prof", label: "Professor" }
+];
+
 export function SubmitPage(): JSX.Element {
   const [form, setForm] = useState<FormState>(initialState);
   const [submitted, setSubmitted] = useState(false);
@@ -39,9 +45,12 @@ export function SubmitPage(): JSX.Element {
     return "";
   }, [form.text]);
 
-  const buildingError = form.buildingCode ? "" : "Building is required.";
   const scopeError =
-    form.scopeType === "course"
+    form.scopeType === "building"
+      ? form.buildingCode
+        ? ""
+        : "Building is required for building myths."
+      : form.scopeType === "course"
       ? form.courseTag.trim()
         ? ""
         : "Course code is required for course myths."
@@ -51,7 +60,23 @@ export function SubmitPage(): JSX.Element {
           : "Professor name is required for professor myths."
         : "";
 
-  const canSubmit = !textError && !buildingError && !scopeError;
+  const canSubmit = !textError && !scopeError;
+
+  const handleScopeChange = (scopeType: FormState["scopeType"]): void => {
+    setForm((prev) => {
+      if (scopeType === prev.scopeType) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        scopeType,
+        buildingCode: scopeType === "building" ? prev.buildingCode : "",
+        courseTag: scopeType === "course" ? prev.courseTag : "",
+        profTag: scopeType === "prof" ? prev.profTag : ""
+      };
+    });
+  };
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -74,10 +99,10 @@ export function SubmitPage(): JSX.Element {
             : form.scopeType === "prof"
               ? form.profTag.trim()
               : form.buildingCode,
-        buildingCode: form.buildingCode,
+        buildingCode: form.scopeType === "building" ? form.buildingCode : undefined,
         programTag: form.programTag.trim(),
-        courseTag: form.courseTag.trim(),
-        profTag: form.profTag.trim(),
+        courseTag: form.scopeType === "course" ? form.courseTag.trim() : "",
+        profTag: form.scopeType === "prof" ? form.profTag.trim() : "",
         tone: form.tone
       });
       setForm(initialState);
@@ -107,25 +132,33 @@ export function SubmitPage(): JSX.Element {
           {submitted && textError ? <span className="form-error">{textError}</span> : null}
         </label>
 
-        <label>
-          Myth category
-          <select
-            value={form.scopeType}
-            onChange={(event) =>
-              setForm({ ...form, scopeType: event.target.value as FormState["scopeType"] })
-            }
-          >
-            <option value="building">Building related</option>
-            <option value="course">Course related</option>
-            <option value="prof">Professor related</option>
-          </select>
-        </label>
+        <div className="scope-tag-group" role="radiogroup" aria-label="Myth category">
+          <p className="scope-tag-label">Myth category</p>
+          <div className="scope-tag-list">
+            {scopeOptions.map((option) => {
+              const active = form.scopeType === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  className={active ? "scope-tag scope-tag-active" : "scope-tag"}
+                  onClick={() => handleScopeChange(option.value)}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         <label>
           Building
           <select
             value={form.buildingCode}
             onChange={(event) => setForm({ ...form, buildingCode: event.target.value })}
+            disabled={form.scopeType !== "building"}
           >
             <option value="">Select a building</option>
             {buildings.map((building) => (
@@ -134,7 +167,6 @@ export function SubmitPage(): JSX.Element {
               </option>
             ))}
           </select>
-          {submitted && buildingError ? <span className="form-error">{buildingError}</span> : null}
         </label>
 
         <div className="form-row">
@@ -153,6 +185,7 @@ export function SubmitPage(): JSX.Element {
               value={form.courseTag}
               onChange={(event) => setForm({ ...form, courseTag: event.target.value })}
               placeholder="ECE 198"
+              disabled={form.scopeType !== "course"}
             />
           </label>
 
@@ -162,6 +195,7 @@ export function SubmitPage(): JSX.Element {
               value={form.profTag}
               onChange={(event) => setForm({ ...form, profTag: event.target.value })}
               placeholder="Prof. Name"
+              disabled={form.scopeType !== "prof"}
             />
           </label>
         </div>

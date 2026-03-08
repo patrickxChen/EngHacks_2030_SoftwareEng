@@ -26,10 +26,7 @@ EngBusters turns rumor sharing into a lightweight, structured fact-check loop:
 - Auth-gated app flow with UW email login pattern.
 - Daily Digest dashboard for trending myth views.
 - Search page with filtering by tags and categories.
-- Myth discussion pages (`/myth/:mythId`) with:
-	- vote widget (`True/False`)
-	- threaded comments/testimonials
-	- contextual tags (course/prof/building)
+- Myth discussion pages (`/myth/:mythId`) with vote widget, comments/testimonials, and contextual tags.
 - Submit flow for creating new myths.
 - Building-level stats endpoint for analytics use.
 
@@ -115,7 +112,6 @@ npm --prefix frontend run build
 npm run typecheck
 npm test
 ```
-
 
 
 

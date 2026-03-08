@@ -25,7 +25,7 @@ export function LoginPage({ onLogin }: LoginPageProps): JSX.Element {
       <div className="login-card">
         <p className="brand-kicker">EngBusters</p>
         <h2>Login</h2>
-        <p className="muted-text">Limit access to UW students.</p>
+        <p className="login-subtitle">Enter your UW email</p>
 
         <form onSubmit={handleSubmit} className="login-form" noValidate>
           <label>

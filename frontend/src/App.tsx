@@ -9,8 +9,12 @@ import { MythDiscussionPage } from "./pages/MythDiscussionPage";
 import { MythsPage } from "./pages/MythsPage";
 import { ResultsPage } from "./pages/ResultsPage";
 import { SubmitPage } from "./pages/SubmitPage";
+import { fetchMyths } from "./lib/api";
+import { templateMyths } from "./data/mockData";
+import type { Myth } from "./types";
 
 const LOGIN_KEY = "uw.loggedInEmail";
+
 function ProtectedRoute({
   isLoggedIn,
   children
@@ -21,7 +25,6 @@ function ProtectedRoute({
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
-
   return children;
 }
 
@@ -31,8 +34,29 @@ function App(): JSX.Element {
   const [loggedInEmail, setLoggedInEmail] = useState<string>(() => {
     return localStorage.getItem(LOGIN_KEY) ?? "";
   });
+  const [myths, setMyths] = useState<Myth[]>([]);
 
   const isLoggedIn = Boolean(loggedInEmail);
+
+  // Keep shared myths state aligned with backend data in logged-in flows.
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    let active = true;
+    const run = async (): Promise<void> => {
+      try {
+        const rows = await fetchMyths({ limit: 50 });
+        if (active) {
+          setMyths([...rows, ...templateMyths]);
+        }
+      } catch {
+        if (active) {
+          setMyths(templateMyths);
+        }
+      }
+    };
+    void run();
+    return () => { active = false; };
+  }, [isLoggedIn, location.pathname]);
 
   useEffect(() => {
     if (loggedInEmail) {
@@ -60,7 +84,7 @@ function App(): JSX.Element {
         path="/home"
         element={
           <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <HomePage loggedInEmail={loggedInEmail} />
+            <HomePage loggedInEmail={loggedInEmail ?? ""} myths={myths} setMyths={setMyths} />
           </ProtectedRoute>
         }
       />
@@ -84,7 +108,7 @@ function App(): JSX.Element {
         path="/search"
         element={
           <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <MythsPage />
+            <MythsPage myths={myths} setMyths={setMyths} />
           </ProtectedRoute>
         }
       />
@@ -92,7 +116,7 @@ function App(): JSX.Element {
         path="/myth/:mythId"
         element={
           <ProtectedRoute isLoggedIn={isLoggedIn}>
-            <MythDiscussionPage />
+            <MythDiscussionPage myths={myths} setMyths={setMyths} />
           </ProtectedRoute>
         }
       />

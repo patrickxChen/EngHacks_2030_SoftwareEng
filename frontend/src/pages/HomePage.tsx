@@ -1,44 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
-import { notificationItems, templateMyths } from "../data/mockData";
+import { useMemo, useState } from "react";
+import { notificationItems } from "../data/mockData";
 import { PostCard } from "../components/PostCard";
-import { fetchMyths } from "../lib/api";
 import type { Myth } from "../types";
+
+const radarColors = ["#90f2e6", "#8fb7ff", "#7f88ff", "#9adf9f", "#ffb3d0"];
 
 interface HomePageProps {
   loggedInEmail: string;
+  myths: Myth[];
+  setMyths: React.Dispatch<React.SetStateAction<Myth[]>>;
 }
 
-export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
+export function HomePage({ loggedInEmail, myths }: HomePageProps): JSX.Element {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [digestView, setDigestView] = useState<"debunked" | "hot" | "true">("debunked");
-  const [myths, setMyths] = useState<Myth[]>(templateMyths);
-
-  useEffect(() => {
-    let active = true;
-    const run = async (): Promise<void> => {
-      try {
-        const rows = await fetchMyths({ limit: 12 });
-        if (active) {
-          const merged = [...templateMyths, ...rows];
-          const byId = new Map<string, Myth>();
-          for (const myth of merged) {
-            byId.set(myth.id, myth);
-          }
-          setMyths(Array.from(byId.values()));
-        }
-      } catch {
-        if (active) {
-          setMyths(templateMyths);
-        }
-      }
-    };
-
-    void run();
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const mostDebunked = useMemo(() => {
     return [...myths]
@@ -93,13 +68,47 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
               100
           )
         : 50;
-
     const profMentions = myths.filter((myth) => myth.scopeType === "prof").length;
+    return { total, avgMythRate, profMentions };
+  }, [myths]);
 
+  const ghostRadar = useMemo(() => {
+    const bucket = new Map<string, number>();
+    for (const myth of myths) {
+      const zone = (myth.buildingCode || myth.scopeKey || "Unknown").toUpperCase().trim() || "Unknown";
+      bucket.set(zone, (bucket.get(zone) ?? 0) + 1);
+    }
+    const ranked = Array.from(bucket.entries())
+      .map(([zone, count]) => ({ zone, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+    const total = ranked.reduce((sum, row) => sum + row.count, 0);
+    if (!total) {
+      return {
+        total: 0,
+        hotspot: "No myth data yet",
+        gradient: "conic-gradient(#2f3f65 0deg 360deg)",
+        rows: [] as Array<{ zone: string; count: number; percent: number; color: string }>
+      };
+    }
+    const rows = ranked.map((row, index) => ({
+      ...row,
+      percent: Math.round((row.count / total) * 100),
+      color: radarColors[index % radarColors.length]
+    }));
+    let cursor = 0;
+    const parts = rows.map((row) => {
+      const sweep = (row.count / total) * 360;
+      const start = cursor;
+      const end = cursor + sweep;
+      cursor = end;
+      return `${row.color} ${start}deg ${end}deg`;
+    });
     return {
       total,
-      avgMythRate,
-      profMentions
+      hotspot: rows[0] ? `${rows[0].zone} (${rows[0].percent}%)` : "No myth data yet",
+      gradient: `conic-gradient(${parts.join(", ")})`,
+      rows
     };
   }, [myths]);
 
@@ -168,28 +177,54 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
           </div>
         </section>
 
-        <aside className={drawerOpen ? "open-panel" : "open-panel open-panel-hidden"}>
-          <h3>Activity</h3>
-          <p className="muted-text">Replies and your latest myth posts.</p>
+        <aside className="digest-side">
+          <section className="ghost-radar-card" aria-label="Ghost Radar concentration">
+            <p className="brand-kicker">Ghost Radar</p>
+            <h4>Spectral concentration map</h4>
+            <p className="muted-text">Hottest zone: {ghostRadar.hotspot}</p>
+            <div className="ghost-radar-wrap">
+              <div className="ghost-radar-ring" style={{ backgroundImage: ghostRadar.gradient }}>
+                <span className="ghost-radar-sweep" aria-hidden="true" />
+                <span className="ghost-radar-sigil" aria-hidden="true" />
+                <div className="ghost-radar-core">
+                  <b>{ghostRadar.total}</b>
+                  <span>myths</span>
+                </div>
+              </div>
+            </div>
+            {ghostRadar.rows.length ? (
+              <ul className="ghost-radar-list">
+                {ghostRadar.rows.map((row) => (
+                  <li key={row.zone}>
+                    <span className="ghost-radar-dot" style={{ backgroundColor: row.color }} aria-hidden="true" />
+                    <span>{row.zone}</span>
+                    <b>{row.percent}%</b>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
 
-          <h4>Replies</h4>
-          <ul className="drawer-list">
-            {replyNotifications.map((note) => (
-              <li key={note.id}>
-                <b>{note.fromUser}</b> {note.message}
-              </li>
-            ))}
-          </ul>
-
-          <h4>Your Posts</h4>
-          <ul className="drawer-list">
-            {myPosts.map((myth) => (
-              <li key={`mypost-${myth.id}`}>{myth.text}</li>
-            ))}
-          </ul>
+          <section className={drawerOpen ? "open-panel" : "open-panel open-panel-hidden"}>
+            <h3>Activity</h3>
+            <p className="muted-text">Replies and your latest myth posts.</p>
+            <h4>Replies</h4>
+            <ul className="drawer-list">
+              {replyNotifications.map((note) => (
+                <li key={note.id}>
+                  <b>{note.fromUser}</b> {note.message}
+                </li>
+              ))}
+            </ul>
+            <h4>Your Posts</h4>
+            <ul className="drawer-list">
+              {myPosts.map((myth) => (
+                <li key={`mypost-${myth.id}`}>{myth.text}</li>
+              ))}
+            </ul>
+          </section>
         </aside>
       </div>
-
     </section>
   );
 }

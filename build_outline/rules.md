@@ -5,7 +5,7 @@
 3. Update `build_outline/architecture.md` when schema, API shape, or service boundaries change.
 4. Update `build_outline/progress.md` after each milestone or major feature.
 5. Every myth feature must preserve building context (`buildingCode`) across UI, API, and data storage.
-6. All privileged logic (verdict generation, aggregate updates, moderation actions) must run in backend API handlers, not client code.
+6. All privileged logic (verdict generation, aggregate updates, moderation actions) must run in Cloud Functions, not client code.
 7. Enforce least privilege with Firebase rules. Clients must never write aggregate stats directly.
 8. Require input validation for myth submission, testimonials, and votes.
 9. Add tests for business logic changes (vote handling, verdict mapping, stats aggregation).

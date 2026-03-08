@@ -44,23 +44,7 @@ export function PostCard({ myth }: PostCardProps): JSX.Element {
         <VerdictBadge verdict={myth.verdictLabel} />
       </div>
 
-      <div className="post-actions" onClick={(event) => event.stopPropagation()}>
-        <button type="button" className="vote-btn vote-icon-btn vote-btn-true" aria-label="Mark post true">
-          <span>True ▲</span>
-          <span className="vote-count" aria-hidden="true">
-            {myth.votesUp}
-          </span>
-        </button>
-        <button type="button" className="vote-btn vote-icon-btn vote-btn-false" aria-label="Mark post false">
-          <span>False ▼</span>
-          <span className="vote-count" aria-hidden="true">
-            {myth.votesDown}
-          </span>
-        </button>
-        <button type="button" className="vote-btn post-reply-btn">
-          Reply
-        </button>
-      </div>
+      <p className="muted-text">Open this myth to vote and join discussion.</p>
 
       {firstReply ? (
         <section className="post-reply-preview">
