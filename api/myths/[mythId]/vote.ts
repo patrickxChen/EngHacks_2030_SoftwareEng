@@ -1,8 +1,8 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { FieldValue } from "firebase-admin/firestore";
-import { getDb, isFirebaseConfigured, resolveUserId } from "../../_lib/firebaseAdmin";
-import { jsonError, jsonOk } from "../../_lib/http";
-import { voteRequestSchema } from "../../_lib/schemas";
+import { getDb, isFirebaseConfigured, resolveUserId } from "../../_lib/firebaseAdmin.js";
+import { jsonError, jsonOk } from "../../_lib/http.js";
+import { voteRequestSchema } from "../../_lib/schemas.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   res.setHeader("Access-Control-Allow-Origin", "*");

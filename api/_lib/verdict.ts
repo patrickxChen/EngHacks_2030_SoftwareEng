@@ -1,7 +1,5 @@
 import OpenAI from "openai";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 type VerdictLabel = "LIKELY_TRUE" | "LIKELY_FALSE" | "MIXED";
 
 export type VerdictResult = {
@@ -24,6 +22,8 @@ export async function generateVerdict(input: {
       confidenceScore: 0.4
     };
   }
+
+  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   const prompt = [
     "You are an assistant for Waterloo Engineering culture myths.",

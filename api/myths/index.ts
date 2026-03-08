@@ -1,11 +1,20 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { FieldValue } from "firebase-admin/firestore";
-import { getDb, isFirebaseConfigured, resolveUserId } from "../_lib/firebaseAdmin";
-import { jsonError, jsonOk } from "../_lib/http";
-import { createMythRequestSchema } from "../_lib/schemas";
-import { generateVerdict } from "../_lib/verdict";
+import { getDb, isFirebaseConfigured, resolveUserId } from "../_lib/firebaseAdmin.js";
+import { jsonError, jsonOk } from "../_lib/http.js";
+import { createMythRequestSchema } from "../_lib/schemas.js";
+import { generateVerdict } from "../_lib/verdict.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-demo-user-id");
+
+  if (req.method === "OPTIONS") {
+    res.status(200).end();
+    return;
+  }
+
   if (req.method === "GET") {
     await handleGetMyths(req, res);
     return;
@@ -49,7 +58,6 @@ async function handleGetMyths(req: VercelRequest, res: VercelResponse): Promise<
     return;
   }
 
-  const db = getDb();
   const q = queryValue(req.query.q).toLowerCase().trim();
   const buildingCode = queryValue(req.query.buildingCode).toUpperCase().trim();
   const programTag = queryValue(req.query.programTag).toLowerCase().trim();
@@ -66,6 +74,7 @@ async function handleGetMyths(req: VercelRequest, res: VercelResponse): Promise<
   }
 
   try {
+    const db = getDb();
     const snap = await db.collection("myths").orderBy("createdAt", "desc").limit(limit).get();
     const filteredDocs = snap.docs.filter((doc) => {
       const data = doc.data();
@@ -168,8 +177,6 @@ async function handleCreateMyth(req: VercelRequest, res: VercelResponse): Promis
     return;
   }
 
-  const db = getDb();
-  const mythRef = db.collection("myths").doc();
   const input = parsed.data;
   const resolvedBuildingCode =
     input.scopeType === "building" ? input.buildingCode ?? input.scopeKey : input.buildingCode ?? "COURSE";
@@ -188,6 +195,8 @@ async function handleCreateMyth(req: VercelRequest, res: VercelResponse): Promis
   }
 
   try {
+    const db = getDb();
+    const mythRef = db.collection("myths").doc();
     await mythRef.set({
       text: input.text,
       scopeType: input.scopeType,
