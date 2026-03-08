@@ -117,7 +117,8 @@ npm test
 
 Ghost icon used in website is taken from FLATICON - https://www.flaticon.com/free-icons/halloween
 
-Github Copilot Pro used for Ghost Radar UI
+Github Copilot Pro used for Ghost Radar UI & Firebase setup
+
 
 
 
