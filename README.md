@@ -113,5 +113,11 @@ npm run typecheck
 npm test
 ```
 
+## Citations
+
+Ghost icon used in website is taken from FLATICON - https://www.flaticon.com/free-icons/halloween
+
+Github Copilot Pro used for Ghost Radar UI
+
 
 
