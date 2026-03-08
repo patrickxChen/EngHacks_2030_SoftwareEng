@@ -381,6 +381,54 @@ fieldset {
   width: auto;
 }
 
+.scope-tag-group {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.scope-tag-label {
+  margin: 0;
+  font-weight: 700;
+}
+
+.scope-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.scope-tag {
+  border: 1px solid rgba(164, 188, 222, 0.38);
+  border-radius: 999px;
+  padding: 0.44rem 0.86rem;
+  background: rgba(10, 20, 38, 0.92);
+  color: #d3e0fb;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background-color 0.16s ease, transform 0.16s ease;
+}
+
+.scope-tag:hover,
+.scope-tag:focus-visible {
+  border-color: rgba(183, 214, 255, 0.62);
+  background: rgba(26, 44, 74, 0.9);
+  transform: translateY(-1px);
+}
+
+.scope-tag-active {
+  border-color: rgba(180, 214, 255, 0.84);
+  background: linear-gradient(145deg, rgba(70, 122, 208, 0.62), rgba(38, 63, 112, 0.96));
+  color: #eff6ff;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .form-error {
   color: #d0d0d0;
   font-size: 0.9rem;
@@ -1029,22 +1077,40 @@ fieldset {
   display: grid;
   place-items: center;
   padding: 1rem;
+  background:
+    radial-gradient(70% 65% at 12% 14%, rgba(120, 200, 255, 0.16), transparent 62%),
+    radial-gradient(72% 62% at 92% 84%, rgba(84, 118, 234, 0.2), transparent 60%),
+    #070c16;
 }
 
 .login-card {
   width: min(460px, 100%);
-  background: var(--glass);
-  border: 1px solid var(--ring-solid);
-  border-radius: 20px;
-  box-shadow: var(--shadow), var(--shadow-glow), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  padding: 1.75rem;
+  background:
+    radial-gradient(120% 135% at 12% -12%, rgba(126, 196, 255, 0.16), transparent 46%),
+    linear-gradient(165deg, rgba(9, 18, 34, 0.95), rgba(8, 14, 28, 0.96));
+  border: 1px solid rgba(165, 206, 255, 0.34);
+  border-radius: 24px;
+  box-shadow: 0 26px 48px rgba(2, 8, 18, 0.66), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  padding: 1.9rem;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+}
+
+.login-card h2 {
+  margin: 0.18rem 0 0;
+  font-size: clamp(1.7rem, 4.8vw, 2.1rem);
+}
+
+.login-subtitle {
+  margin: 0.25rem 0 0;
+  color: #d4e3ff;
+  font-size: 1rem;
 }
 
 .login-form {
   display: grid;
   gap: 0.75rem;
+  margin-top: 0.95rem;
 }
 
 .concept-board {

@@ -34,25 +34,29 @@ function App(): JSX.Element {
   const [loggedInEmail, setLoggedInEmail] = useState<string>(() => {
     return localStorage.getItem(LOGIN_KEY) ?? "";
   });
-  const [myths, setMyths] = useState<Myth[]>(templateMyths);
+  const [myths, setMyths] = useState<Myth[]>([]);
 
   const isLoggedIn = Boolean(loggedInEmail);
 
-  // Fetch myths once on login, refresh on every navigation
+  // Keep shared myths state aligned with backend data in logged-in flows.
   useEffect(() => {
     if (!isLoggedIn) return;
     let active = true;
     const run = async (): Promise<void> => {
       try {
         const rows = await fetchMyths({ limit: 50 });
-        if (active && rows.length) setMyths(rows);
+        if (active) {
+          setMyths([...rows, ...templateMyths]);
+        }
       } catch {
-        if (active) setMyths(templateMyths);
+        if (active) {
+          setMyths(templateMyths);
+        }
       }
     };
     void run();
     return () => { active = false; };
-  }, [isLoggedIn]);
+  }, [isLoggedIn, location.pathname]);
 
   useEffect(() => {
     if (loggedInEmail) {

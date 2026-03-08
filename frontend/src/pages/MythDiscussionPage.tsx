@@ -44,11 +44,14 @@ export function MythDiscussionPage({ myths, setMyths }: MythDiscussionPageProps)
 
     try {
       setCommenting(true);
-      await addTestimonial(myth.id, {
-        buildingCode: myth.buildingCode,
-        text: commentText.trim(),
-        voteValue: commentVote === "true" ? 1 : -1
-      });
+      const isTemplateMyth = myth.id.startsWith("tmpl-");
+      if (!isTemplateMyth) {
+        await addTestimonial(myth.id, {
+          buildingCode: myth.buildingCode,
+          text: commentText.trim(),
+          voteValue: commentVote === "true" ? 1 : -1
+        });
+      }
 
       const nextVoteValue: 1 | -1 = commentVote === "true" ? 1 : -1;
       const wasUp = commentVote === "true";
@@ -79,7 +82,7 @@ export function MythDiscussionPage({ myths, setMyths }: MythDiscussionPageProps)
 
       setCommentText("");
       setCommentVote("true");
-      setMessage("Comment added.");
+      setMessage(isTemplateMyth ? "Comment added to example myth." : "Comment added.");
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Failed to add comment.");
     } finally {
