@@ -1,41 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
-import { notificationItems, templateMyths } from "../data/mockData";
+import { useMemo, useState } from "react";
+import { notificationItems } from "../data/mockData";
 import { PostCard } from "../components/PostCard";
-import { fetchMyths } from "../lib/api";
 import type { Myth } from "../types";
 
 const radarColors = ["#90f2e6", "#8fb7ff", "#7f88ff", "#9adf9f", "#ffb3d0"];
 
 interface HomePageProps {
   loggedInEmail: string;
+  myths: Myth[];
+  setMyths: React.Dispatch<React.SetStateAction<Myth[]>>;
 }
 
-export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
+export function HomePage({ loggedInEmail, myths }: HomePageProps): JSX.Element {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [digestView, setDigestView] = useState<"debunked" | "hot" | "true">("debunked");
-  const [myths, setMyths] = useState<Myth[]>(templateMyths);
-
-  useEffect(() => {
-    let active = true;
-    const run = async (): Promise<void> => {
-      try {
-        const rows = await fetchMyths({ limit: 12 });
-        if (active) {
-          setMyths(rows.length ? rows : templateMyths);
-        }
-      } catch {
-        if (active) {
-          setMyths(templateMyths);
-        }
-      }
-    };
-
-    void run();
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
   const mostDebunked = useMemo(() => {
     return [...myths]
@@ -90,14 +68,8 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
               100
           )
         : 50;
-
     const profMentions = myths.filter((myth) => myth.scopeType === "prof").length;
-
-    return {
-      total,
-      avgMythRate,
-      profMentions
-    };
+    return { total, avgMythRate, profMentions };
   }, [myths]);
 
   const ghostRadar = useMemo(() => {
@@ -106,12 +78,10 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
       const zone = (myth.buildingCode || myth.scopeKey || "Unknown").toUpperCase().trim() || "Unknown";
       bucket.set(zone, (bucket.get(zone) ?? 0) + 1);
     }
-
     const ranked = Array.from(bucket.entries())
       .map(([zone, count]) => ({ zone, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
-
     const total = ranked.reduce((sum, row) => sum + row.count, 0);
     if (!total) {
       return {
@@ -121,13 +91,11 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
         rows: [] as Array<{ zone: string; count: number; percent: number; color: string }>
       };
     }
-
     const rows = ranked.map((row, index) => ({
       ...row,
       percent: Math.round((row.count / total) * 100),
       color: radarColors[index % radarColors.length]
     }));
-
     let cursor = 0;
     const parts = rows.map((row) => {
       const sweep = (row.count / total) * 360;
@@ -136,7 +104,6 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
       cursor = end;
       return `${row.color} ${start}deg ${end}deg`;
     });
-
     return {
       total,
       hotspot: rows[0] ? `${rows[0].zone} (${rows[0].percent}%)` : "No myth data yet",
@@ -215,7 +182,6 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
             <p className="brand-kicker">Ghost Radar</p>
             <h4>Spectral concentration map</h4>
             <p className="muted-text">Hottest zone: {ghostRadar.hotspot}</p>
-
             <div className="ghost-radar-wrap">
               <div className="ghost-radar-ring" style={{ backgroundImage: ghostRadar.gradient }}>
                 <span className="ghost-radar-sweep" aria-hidden="true" />
@@ -226,7 +192,6 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
                 </div>
               </div>
             </div>
-
             {ghostRadar.rows.length ? (
               <ul className="ghost-radar-list">
                 {ghostRadar.rows.map((row) => (
@@ -243,7 +208,6 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
           <section className={drawerOpen ? "open-panel" : "open-panel open-panel-hidden"}>
             <h3>Activity</h3>
             <p className="muted-text">Replies and your latest myth posts.</p>
-
             <h4>Replies</h4>
             <ul className="drawer-list">
               {replyNotifications.map((note) => (
@@ -252,7 +216,6 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
                 </li>
               ))}
             </ul>
-
             <h4>Your Posts</h4>
             <ul className="drawer-list">
               {myPosts.map((myth) => (
@@ -262,7 +225,6 @@ export function HomePage({ loggedInEmail }: HomePageProps): JSX.Element {
           </section>
         </aside>
       </div>
-
     </section>
   );
 }
