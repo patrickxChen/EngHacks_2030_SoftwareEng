@@ -20,6 +20,13 @@ export function MythDiscussionPage({ myths, setMyths }: MythDiscussionPageProps)
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  const localUsername = useMemo(() => {
+    const email = (localStorage.getItem("uw.loggedInEmail") ?? "").trim().toLowerCase();
+    const [localPart] = email.split("@");
+    const normalized = String(localPart ?? "").replace(/[^a-z0-9._-]/g, "").slice(0, 32);
+    return normalized || "Anonymous";
+  }, []);
+
   // Find myth from shared state instead of fetching
   const myth = useMemo(() => {
     const found = myths.find((entry) => entry.id === mythId);
@@ -58,7 +65,7 @@ export function MythDiscussionPage({ myths, setMyths }: MythDiscussionPageProps)
 
       const nextTestimonial = {
         id: `local-${Date.now()}`,
-        userName: "You",
+        userName: localUsername,
         buildingCode: myth.buildingCode,
         text: commentText.trim(),
         voteValue: nextVoteValue,

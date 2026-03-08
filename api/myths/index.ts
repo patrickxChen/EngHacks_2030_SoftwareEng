@@ -8,7 +8,7 @@ import { generateVerdict } from "../_lib/verdict.js";
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-demo-user-id");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-demo-user-id, x-user-name");
 
   if (req.method === "OPTIONS") {
     res.status(200).end();
@@ -46,6 +46,31 @@ function toIso(value: unknown): string {
   }
 
   return new Date().toISOString();
+}
+
+function normalizeUsername(value: unknown): string {
+  const raw = String(value ?? "").trim().toLowerCase();
+  if (!raw) {
+    return "";
+  }
+
+  const [localPart] = raw.split("@");
+  return String(localPart ?? "").replace(/[^a-z0-9._-]/g, "").slice(0, 32);
+}
+
+function buildDisplayName(userName: unknown, userId: unknown): string {
+  const normalizedName = normalizeUsername(userName);
+  if (normalizedName) {
+    return normalizedName;
+  }
+
+  const rawId = String(userId ?? "").trim().toLowerCase();
+  if (!rawId || rawId.startsWith("demo-")) {
+    return "Anonymous";
+  }
+
+  const normalizedId = normalizeUsername(rawId);
+  return normalizedId || "Anonymous";
 }
 
 async function handleGetMyths(req: VercelRequest, res: VercelResponse): Promise<void> {
@@ -122,7 +147,7 @@ async function handleGetMyths(req: VercelRequest, res: VercelResponse): Promise<
                   const value = entry.data();
                   return {
                     id: entry.id,
-                    userName: String(value.userName ?? value.userId ?? "Anonymous"),
+                    userName: buildDisplayName(value.userName, value.userId),
                     buildingCode: String(value.buildingCode ?? data.buildingCode ?? ""),
                     text: String(value.text ?? ""),
                     voteValue: Number(value.voteValue ?? 1) === -1 ? -1 : 1,

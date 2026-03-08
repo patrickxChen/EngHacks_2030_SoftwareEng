@@ -7,7 +7,7 @@ import { testimonialRequestSchema } from "../../_lib/schemas.js";
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-demo-user-id");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-demo-user-id, x-user-name");
 
   if (req.method === "OPTIONS") {
     res.status(200).end();
@@ -41,6 +41,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return;
   }
 
+  const rawUserName = Array.isArray(req.headers["x-user-name"])
+    ? req.headers["x-user-name"][0]
+    : req.headers["x-user-name"];
+  const userName = String(rawUserName ?? "")
+    .trim()
+    .toLowerCase()
+    .split("@")[0]
+    .replace(/[^a-z0-9._-]/g, "")
+    .slice(0, 32);
+
   if (!isFirebaseConfigured()) {
     jsonOk(res, { mythId, testimonialId: `demo-${Date.now()}`, mode: "demo" });
     return;
@@ -67,6 +77,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
       tx.set(testimonialRef, {
         userId: uid,
+        userName: userName || "Anonymous",
         buildingCode: body.data.buildingCode,
         text: body.data.text,
         voteValue: nextVote,

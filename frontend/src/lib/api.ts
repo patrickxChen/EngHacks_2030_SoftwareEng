@@ -34,6 +34,17 @@ export type CreateMythPayload = {
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 const TOKEN_KEY = "uw.idToken";
 const DEMO_USER_KEY = "uw.demoUserId";
+const LOGIN_KEY = "uw.loggedInEmail";
+
+function getDisplayUsername(): string {
+  const email = (localStorage.getItem(LOGIN_KEY) ?? "").trim().toLowerCase();
+  if (!email) {
+    return "";
+  }
+
+  const [localPart] = email.split("@");
+  return (localPart ?? "").replace(/[^a-z0-9._-]/g, "").slice(0, 32);
+}
 
 function getOrCreateDemoUserId(): string {
   const existing = localStorage.getItem(DEMO_USER_KEY);
@@ -53,10 +64,12 @@ function getOrCreateDemoUserId(): string {
 function buildHeaders(): HeadersInit {
   const idToken = localStorage.getItem(TOKEN_KEY) ?? "";
   const demoUserId = getOrCreateDemoUserId();
+  const username = getDisplayUsername();
 
   const baseHeaders: HeadersInit = {
     "Content-Type": "application/json",
-    "X-Demo-User-Id": demoUserId
+    "X-Demo-User-Id": demoUserId,
+    ...(username ? { "X-User-Name": username } : {})
   };
 
   return idToken
